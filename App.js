@@ -1,8 +1,12 @@
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { SQLiteProvider, useSQLiteContext } from 'expo-sqlite';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import LoginScreen from './screens/LoginScreen';
+import RegisterScreen from './screens/RegisterScreen';
+import HomeScreen from './screens/HomeScreen';
 
 const initializeDatabase = async (db) => {
   try {
@@ -36,18 +40,6 @@ export default function App() {
       </NavigationContainer>
     </SQLiteProvider>
   );
-}
-
-const LoginScreen = () => {
-
-}
-
-const RegisterScreen = () => {
-
-}
-
-const HomeScreen = () => {
-  
 }
 
 const styles = StyleSheet.create({
