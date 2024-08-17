@@ -36,12 +36,10 @@ const LoginScreen = ({navigation}) => {
     return (
         <SafeAreaView style = {styles.container}>
             <View style = {styles.headerStyle}>
-                <Text>
-                    asd
-                </Text>
+                <Image source={require('../assets/icon.png')} style = {styles.picLogo}/>
             </View>
             
-            <View>
+            <View style = {styles.bodyStyle}>
                 <Text style = {styles.title}>
                     Login
                 </Text>
@@ -81,12 +79,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-        height: heightPercentageToDP('100%')
     },
     title: {
         fontSize: 24,
         fontWeight: "bold",
         marginBottom: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     subtitle: {
 
@@ -118,18 +117,21 @@ const styles = StyleSheet.create({
         color: "blue",
     },
     headerStyle:{
-        backgroundColor: "green",
+        backgroundColor: "white",
         height: heightPercentageToDP('35%'),
-        alignItems: "stretch"
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     picLogo: {
         alignContent: "stretch",
-        resizeMode: "center",
-        alignItems: "center",
+        width: 250,
+        height: 250,  
+        marginTop: 50    
     },
     bodyStyle:{
         height: heightPercentageToDP("100%"),
-        backgroundColor: "pink",
+        backgroundColor: "#b75f5e",
+        borderTopRightRadius: 75,
     },
 });
 
