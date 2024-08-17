@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, TextInput, Alert, StyleSheet, SafeAreaView, Pressable } from 'react-native';
+import { View, Text, TextInput, Alert, StyleSheet, SafeAreaView, Pressable, Image } from 'react-native';
 import { useState } from 'react';
 import { SQLiteProvider, useSQLiteContext } from 'expo-sqlite';
+import { widthPercentageToDP, heightPercentageToDP } from 'react-native-responsive-screen';
 
 const LoginScreen = ({navigation}) => {
     const db = useSQLiteContext();
@@ -34,34 +35,43 @@ const LoginScreen = ({navigation}) => {
 
     return (
         <SafeAreaView style = {styles.container}>
-            <Text style = {styles.title}>
-                Login
-            </Text>
+            <View style = {styles.headerStyle}>
+                <Text>
+                    asd
+                </Text>
+            </View>
             
-            <TextInput 
-                style={styles.input} 
-                placeholder='Username'
-                value = {userName}
-                onChangeText={setUserName}
-            />
-            <TextInput 
-                style={styles.input} 
-                placeholder='Password' 
-                secureTextEntry
-                onChangeText={setPassword}
-            />
-            
-            <Pressable style = {styles.button} onPress={handleLogin}>
-                <Text style = {styles.buttonText}>
+            <View>
+                <Text style = {styles.title}>
                     Login
                 </Text>
-            </Pressable>
+                
+                <TextInput 
+                    style={styles.input} 
+                    placeholder='Username'
+                    value = {userName}
+                    onChangeText={setUserName}
+                />
+                <TextInput 
+                    style={styles.input} 
+                    placeholder='Password' 
+                    secureTextEntry
+                    onChangeText={setPassword}
+                />
+                
+                <Pressable style = {styles.button} onPress={handleLogin}>
+                    <Text style = {styles.buttonText}>
+                        Login
+                    </Text>
+                </Pressable>
 
-            <Pressable style = {styles.link} onPress={() => navigation.navigate("Register")}>
-                <Text style = {styles.linkText}>
-                    Don't have an account? Register
-                </Text>
-            </Pressable>
+                <Pressable style = {styles.link} onPress={() => navigation.navigate("Register")}>
+                    <Text style = {styles.linkText}>
+                        Don't have an account? Register
+                    </Text>
+                </Pressable>
+
+            </View>
 
         </SafeAreaView>
     )
@@ -69,29 +79,33 @@ const LoginScreen = ({navigation}) => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center",
+        height: heightPercentageToDP('100%'),
+        backgroundColor: "#b75f5e",
+        borderTopRightRadius: 100,
     },
     title: {
         fontSize: 24,
         fontWeight: "bold",
         marginBottom: 30,
     },
+    subtitle: {
+
+    },
     input: {
         width: "80%",
         padding: 10,
-        borderWidth: 1,
+        borderWidth: 0,
         borderColor: "#cccccc",
         marginVertical: 5,
+        backgroundColor: "#d39b9a",
+        borderRadius: 15,
     },
     button: {
         backgroundColor: "#96dcfd", //blue to be changed upon the color palette
         padding: 10,
         marginVertical: 10,
         width: "80%",
-        borderRadius: 5,
+        borderRadius: 15,
     },
     buttonText: {
         textAlign: "center",
@@ -103,7 +117,16 @@ const styles = StyleSheet.create({
     linkText:{
         color: "blue",
     },
-    
+    headerStyle:{
+        backgroundColor: "white",
+        height: heightPercentageToDP('35%'),
+        alignItems: "stretch"
+    },
+    picLogo: {
+        alignContent: "stretch",
+        resizeMode: "center",
+        alignItems: "center",
+    },
 });
 
 export default LoginScreen;
