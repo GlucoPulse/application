@@ -79,9 +79,9 @@ const LoginScreen = ({navigation}) => {
 
 const styles = StyleSheet.create({
     container: {
-        height: heightPercentageToDP('100%'),
-        backgroundColor: "#b75f5e",
-        borderTopRightRadius: 100,
+        flex: 1,
+        backgroundColor: "#fff",
+        height: heightPercentageToDP('100%')
     },
     title: {
         fontSize: 24,
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
         color: "blue",
     },
     headerStyle:{
-        backgroundColor: "white",
+        backgroundColor: "green",
         height: heightPercentageToDP('35%'),
         alignItems: "stretch"
     },
@@ -126,6 +126,10 @@ const styles = StyleSheet.create({
         alignContent: "stretch",
         resizeMode: "center",
         alignItems: "center",
+    },
+    bodyStyle:{
+        height: heightPercentageToDP("100%"),
+        backgroundColor: "pink",
     },
 });
 
