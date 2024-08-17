@@ -43,6 +43,9 @@ const LoginScreen = ({navigation}) => {
                 <Text style = {styles.title}>
                     Login
                 </Text>
+                <Text style = {styles.subtitle}>
+                    Sign in to continue
+                </Text>
                 
                 <TextInput 
                     style={styles.input} 
@@ -81,40 +84,42 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
     },
     title: {
-        fontSize: 24,
+        fontSize: 36,
         fontWeight: "bold",
-        marginBottom: 30,
-        justifyContent: 'center',
-        alignItems: 'center',
+        marginBottom: 5,
+        marginTop: 75
     },
     subtitle: {
-
+        fontSize: 16,
+        color: 'white',
+        marginBottom: 30
     },
     input: {
         width: "80%",
-        padding: 10,
+        padding: 15,
         borderWidth: 0,
         borderColor: "#cccccc",
-        marginVertical: 5,
+        marginVertical: 10,
         backgroundColor: "#d39b9a",
         borderRadius: 15,
     },
     button: {
-        backgroundColor: "#96dcfd", //blue to be changed upon the color palette
+        backgroundColor: "black", //blue to be changed upon the color palette
         padding: 10,
-        marginVertical: 10,
-        width: "80%",
+        marginVertical: 15,
+        width: "75%",
         borderRadius: 15,
     },
     buttonText: {
         textAlign: "center",
         fontSize: 16,
+        color: "white"
     },
     link: {
-        marginTop: 10,
+        marginTop: 50,
     },
     linkText:{
-        color: "blue",
+        color: "white",
     },
     headerStyle:{
         backgroundColor: "white",
@@ -132,6 +137,8 @@ const styles = StyleSheet.create({
         height: heightPercentageToDP("100%"),
         backgroundColor: "#b75f5e",
         borderTopRightRadius: 75,
+        
+        alignItems: 'center',
     },
 });
 

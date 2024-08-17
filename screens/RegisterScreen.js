@@ -7,35 +7,36 @@ const LoginScreen = ({navigation}) => {
     const db = useSQLiteContext();
     const [userName, setUserName] = useState ('');
     const [password, setPassword] = useState ('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
-    const handleLogin = async () => {
-        if (userName.length === 0 || password.length === 0){
-            Alert.alert ('Attention', 'Please enter both username and password');
+    const handleRegister = async () => {
+        if (userName.length === 0 || password.length === 0 || confirmPassword.length === 0) {
+            Alert.alert ('Attention!', 'Please enter all the fields.');
+            return;
+        }
+        if (password !== confirmPassword) {
+            Alert.alert ('Error', 'Password do not match');
             return;
         }
         try {
-            const user = await db.getFirstAsync('SELECT * FROM users WHERE username = ?', [userName]);
-            if (!user){
-                Alert.alert('Error', 'Username does not exist');
+            const existingUser = await db.getFirstAsync ('SELECT * FROM users WHERE username = ?', [userName]);
+            if (existingUser) {
+                Alert.alert ('Error', 'Username already exists.');
                 return;
             }
-            const validUser = await db.getFirstAsync ('SELECT * FROM users WHERE username = ? AND password = ?', [userName, password]);
-            if (validUser) {
-                Alert.alert ('Success', 'Login successful');
-                navigation.navigate ('Home', {user:userName});
-            } else {
-                Alert.alert ('Error', 'Incorrect password');
-            }
+            await db.runAsync('INSERT INTO users (username, password) VALUES (?, ?)', [userName, password]);
+            Alert.alert ('Success', 'Registration successful!');
+            navigation.navigate ('Home', {user:userName});
         }
         catch (error) {
-            console.log ('Error during login: ', error);
+            console.log ('Error during registration: ', error);
         }
     }
-
+    
     return (
         <SafeAreaView style = {styles.container}>
             <Text style = {styles.title}>
-                Login
+                Register
             </Text>
             
             <TextInput 
@@ -48,18 +49,26 @@ const LoginScreen = ({navigation}) => {
                 style={styles.input} 
                 placeholder='Password' 
                 secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+            />
+            <TextInput 
+                style={styles.input} 
+                placeholder='Password' 
+                secureTextEntry
+                value={confirmPassword}
                 onChangeText={setPassword}
             />
             
-            <Pressable style = {styles.button} onPress={handleLogin}>
+            <Pressable style = {styles.button} onPress={handleRegister}>
                 <Text style = {styles.buttonText}>
-                    Login
+                    Register
                 </Text>
             </Pressable>
 
-            <Pressable style = {styles.link} onPress={() => navigation.navigate("Register")}>
+            <Pressable style = {styles.link} onPress={() => navigation.navigate("Login")}>
                 <Text style = {styles.linkText}>
-                    Don't have an account? Register
+                    Already have an account? Login
                 </Text>
             </Pressable>
 
@@ -84,7 +93,7 @@ const styles = StyleSheet.create({
         padding: 10,
         borderWidth: 1,
         borderColor: "#cccccc",
-        marginVertical: 5,
+        marginVertical: 10,
     },
     button: {
         backgroundColor: "#96dcfd", //blue to be changed upon the color palette
