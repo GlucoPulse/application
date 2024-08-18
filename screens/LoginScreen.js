@@ -35,13 +35,13 @@ const LoginScreen = ({navigation}) => {
 
     return (
         <SafeAreaView style = {styles.container}>
-            <View style = {styles.headerStyle}>
+            <SafeAreaView style = {styles.headerStyle}>
                 <Image source={require('../assets/icon.png')} style = {styles.picLogo}/>
-            </View>
+            </SafeAreaView>
             
-            <View style = {styles.bodyStyle}>
+            <SafeAreaView style = {styles.bodyStyle}>
                 <Text style = {styles.title}>
-                    Login
+                    LOGIN
                 </Text>
                 <Text style = {styles.subtitle}>
                     Sign in to continue
@@ -71,8 +71,7 @@ const LoginScreen = ({navigation}) => {
                         Don't have an account? Register
                     </Text>
                 </Pressable>
-
-            </View>
+            </SafeAreaView>
 
         </SafeAreaView>
     )
@@ -87,7 +86,8 @@ const styles = StyleSheet.create({
         fontSize: 36,
         fontWeight: "bold",
         marginBottom: 5,
-        marginTop: 75
+        marginTop: 75,
+        color: 'white'
     },
     subtitle: {
         fontSize: 16,
@@ -100,11 +100,11 @@ const styles = StyleSheet.create({
         borderWidth: 0,
         borderColor: "#cccccc",
         marginVertical: 10,
-        backgroundColor: "#d39b9a",
+        backgroundColor: "#768cc9",
         borderRadius: 15,
     },
     button: {
-        backgroundColor: "black", //blue to be changed upon the color palette
+        backgroundColor: "black", 
         padding: 10,
         marginVertical: 15,
         width: "75%",
@@ -135,9 +135,8 @@ const styles = StyleSheet.create({
     },
     bodyStyle:{
         height: heightPercentageToDP("100%"),
-        backgroundColor: "#b75f5e",
+        backgroundColor: "#2144AF",
         borderTopRightRadius: 75,
-        
         alignItems: 'center',
     },
 });

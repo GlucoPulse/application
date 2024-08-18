@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, TextInput, Alert, StyleSheet, SafeAreaView, Pressable } from 'react-native';
+import { View, Text, TextInput, Alert, StyleSheet, SafeAreaView, Pressable, Image } from 'react-native';
 import { useState } from 'react';
 import { SQLiteProvider, useSQLiteContext } from 'expo-sqlite';
+import { widthPercentageToDP, heightPercentageToDP } from 'react-native-responsive-screen';
 
 const LoginScreen = ({navigation}) => {
     const db = useSQLiteContext();
@@ -35,42 +36,51 @@ const LoginScreen = ({navigation}) => {
     
     return (
         <SafeAreaView style = {styles.container}>
-            <Text style = {styles.title}>
-                Register
-            </Text>
+            <SafeAreaView style = {styles.headerStyle}>
+                <Image source = {require('../assets/word-logo.png')} style = {styles.picLogo} />
+            </SafeAreaView>
             
-            <TextInput 
-                style={styles.input} 
-                placeholder='Username'
-                value = {userName}
-                onChangeText={setUserName}
-            />
-            <TextInput 
-                style={styles.input} 
-                placeholder='Password' 
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-            />
-            <TextInput 
-                style={styles.input} 
-                placeholder='Password' 
-                secureTextEntry
-                value={confirmPassword}
-                onChangeText={setPassword}
-            />
-            
-            <Pressable style = {styles.button} onPress={handleRegister}>
-                <Text style = {styles.buttonText}>
-                    Register
+            <SafeAreaView style = {styles.bodyStyle}>
+                <Text style = {styles.title}>
+                    REGISTER
                 </Text>
-            </Pressable>
+                <Text style = {styles.subtitle}>
+                    Create an account to continue
+                </Text>
+                
+                <TextInput 
+                    style={styles.input} 
+                    placeholder='Username'
+                    value = {userName}
+                    onChangeText={setUserName}
+                />
+                <TextInput 
+                    style={styles.input} 
+                    placeholder='Password' 
+                    secureTextEntry
+                    value={password}
+                    onChangeText={setPassword}
+                />
+                <TextInput 
+                    style={styles.input} 
+                    placeholder='Confirm Password' 
+                    secureTextEntry
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                />
+                
+                <Pressable style = {styles.button} onPress={handleRegister}>
+                    <Text style = {styles.buttonText}>
+                        Register
+                    </Text>
+                </Pressable>
 
-            <Pressable style = {styles.link} onPress={() => navigation.navigate("Login")}>
-                <Text style = {styles.linkText}>
-                    Already have an account? Login
-                </Text>
-            </Pressable>
+                <Pressable style = {styles.link} onPress={() => navigation.navigate("Login")}>
+                    <Text style = {styles.linkText}>
+                        Already have an account? Login
+                    </Text>
+                </Pressable>
+            </SafeAreaView>
 
         </SafeAreaView>
     )
@@ -80,39 +90,64 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center",
     },
     title: {
-        fontSize: 24,
+        fontSize: 36,
         fontWeight: "bold",
-        marginBottom: 30,
+        marginBottom: 5,
+        marginTop: 100,
+        color: 'white'
     },
     input: {
         width: "80%",
-        padding: 10,
-        borderWidth: 1,
+        padding: 15,
+        borderWidth: 0,
         borderColor: "#cccccc",
         marginVertical: 10,
+        backgroundColor: "#768cc9",
+        borderRadius: 15,
     },
     button: {
-        backgroundColor: "#96dcfd", //blue to be changed upon the color palette
+        backgroundColor: "black",
         padding: 10,
-        marginVertical: 10,
-        width: "80%",
-        borderRadius: 5,
+        marginVertical: 15,
+        width: "75%",
+        borderRadius: 15,
     },
     buttonText: {
         textAlign: "center",
         fontSize: 16,
+        color: 'white'
     },
     link: {
-        marginTop: 10,
+        marginTop: 50,
     },
     linkText:{
-        color: "blue",
+        color: "white",
     },
-    
+    headerStyle: {
+        backgroundColor: "white",
+        height: heightPercentageToDP ('20%'),
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    picLogo: {
+        alignContent: 'stretch',
+        width: 300,
+        height: 300,
+        marginTop: 50
+    },
+    bodyStyle: {
+        height: heightPercentageToDP("100%"),
+        backgroundColor: '#2144Af',
+        borderTopLeftRadius: 75,
+        alignItems: 'center',
+    },
+    subtitle: {
+        fontSize: 16,
+        color: 'white',
+        marginBottom: 50,    
+    }
 });
 
 export default LoginScreen;
