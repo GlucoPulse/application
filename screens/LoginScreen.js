@@ -36,7 +36,7 @@ const LoginScreen = ({navigation}) => {
     return (
         <SafeAreaView style = {styles.container}>
             <SafeAreaView style = {styles.headerStyle}>
-                <Image source={require('../assets/icon.png')} style = {styles.picLogo}/>
+                <Image source={require('../assets/icon.png')} style = {styles.picLogo} />
             </SafeAreaView>
             
             <SafeAreaView style = {styles.bodyStyle}>
