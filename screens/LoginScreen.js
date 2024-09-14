@@ -1,41 +1,94 @@
-import { KeyboardAvoidingView, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { KeyboardAvoidingView, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from 'react-native'
 import React from 'react'
 import { useState } from 'react';
 import { auth } from '../firebase';
 import firebaseConfig from '../firebase'
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { useNavigation } from '@react-navigation/native';
+import { useEffect } from 'react';
 
 const LoginScreen = () => {
     const [email, setEmail] = useState ('');
     const [username, setUsername] = useState ('');
     const [password, setPassword] = useState ('');
 
+    const navigation = useNavigation()
+   
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(user => {
+            if (user) {
+                navigation.navigate("Home")
+            }
+        })
+
+        return unsubscribe
+    }, [] )
+    
+
     const handleSignUp = () => {
         createUserWithEmailAndPassword (auth, email, password)
             .then ((userCredentials) => {
                 const user = userCredentials.user;
-                console.log (user.username);
+                console.log ('Registered with: ',user.email);
             })
             .catch((error) => {alert(error.message)}); //WEAK PASSWORD AND USED EMAIL
     }
 
+    const handleLogin = () => {
+        signInWithEmailAndPassword(auth,email,password)
+        .then ((userCredentials) => {
+            const user = userCredentials.user;
+            console.log ('Logged in with: ', user.email);
+        })
+        .catch((error) => {alert(error.message)}); //WEAK PASSWORD AND USED EMAIL
+    }
+
     return (
         <KeyboardAvoidingView style = {styles.container} behavior = 'padding'>
-            <View style={styles.inputContainer}>
-                <TextInput placeholder = "Email" style = {styles.input} value={email} onChangeText={text => setEmail(text)} /> 
-                <TextInput placeholder = "Username" style = {styles.input} value={username} onChangeText={text => setUsername(text)} /> 
-                <TextInput placeholder = "Password" style = {styles.input} secureTextEntry value={password} onChangeText={text => setPassword(text)} />
+            <View style = {styles.header}>
+                <Image source={require('../assets/icon.png')} style={styles.picLogo} />
+
+                
             </View>
+            
+            <View style = {styles.body}>
+                <Text style = {styles.title}>
+                    LOGIN </Text>
+                <Text style = {styles.subtitle}>
+                    Sign in to continue </Text>
 
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity onPress= {() => {}} style={styles.button}>
-                    <Text style ={styles.buttonText}> Login </Text>
-                </TouchableOpacity>
+                <View style={styles.inputContainer}>
+                    <TextInput 
+                        placeholder = "Email" 
+                        style = {styles.input} value={email} 
+                        onChangeText={text => setEmail(text)} />      
 
-                <TouchableOpacity onPress= {handleSignUp} style={[styles.button, styles.buttonOutline]}>
-                    <Text style ={styles.buttonOutlineText}> Register </Text>
-                </TouchableOpacity>
+                    <TextInput 
+                        placeholder = "Username" 
+                        style = {styles.input} value={username} 
+                        onChangeText={text => setUsername(text)} />                                     
+                    
+                    <TextInput 
+                        placeholder = "Password" 
+                        style = {styles.input} 
+                        secureTextEntry 
+                        value={password} 
+                        onChangeText={text => setPassword(text)} /> 
+                        
+                        
+                    
+                </View>
+
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity onPress= {handleLogin} style={styles.button}>
+                        <Text style ={styles.buttonText}> Login </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress= {handleSignUp} style={[styles.button, styles.buttonOutline]}>
+                        <Text style ={styles.buttonOutlineText}> Register </Text>
+                    </TouchableOpacity>
+                </View>
+           
             </View>
         </KeyboardAvoidingView>
   )
@@ -45,20 +98,53 @@ export default LoginScreen
 
 const styles = StyleSheet.create({
     container: {
-        justifyContent: 'center',
+        backgroundColor: 'white',
         alignItems: 'center',
         flex: 1,
     },
+    header: {
+        height: '30%',
+        width:'100%',
+        backgroundColor:'white',
+        justifyContent:'center',
+        alignItems: 'center'
+    },
+    picLogo: {
+        alignContent: 'stretch',
+        width: 250,
+        height: 250,
+        marginTop: 50,
+    },
+    body: {
+        height:'100%',
+        backgroundColor: '#2144af',
+        width: '100%',
+        alignItems: 'center',
+        borderTopRightRadius: 75
+    },
+    title: {
+        fontSize: 36,
+        fontWeight: "bold",
+        marginBottom: 5,
+        marginTop: 35,
+        color: 'white'
+    },
+    subtitle: {
+        fontSize: 16,
+        color: 'white',
+        marginBottom:30
+    },
     inputContainer: {
         width: '80%',
-
     },
     input: {
         backgroundColor: 'white',
-        paddingHorizontal: 15, 
-        paddingVertical: 10,
-        borderRadius: 10,
-        marginTop: 5
+        padding: 15,
+        borderRadius: 15,
+        borderColor: '#cccccc',
+        marginVertical: 10,
+        backgroundColor:"#758bcd",
+
     },
     buttonContainer: {
         width: '60%',
@@ -68,26 +154,31 @@ const styles = StyleSheet.create({
 
     },
     button: {
-        backgroundColor: '#1782fa',
+        backgroundColor: 'black',
         width: '100%',
         padding: 15,
         borderRadius: 10,
         alignItems: 'center',
+        marginBottom: 5
     }, 
     buttonText: {
         color: 'white',
         fontWeight: '700',
         fontSize: 16,
+        textAlign: 'center',
     },
     buttonOutline: {
+        marginBottom: 5,
         backgroundColor: 'white',
         marginTop: 5,
-        borderColor: '#1782fa',
+        borderColor: 'white',
         borderWidth: 2,
     },
     buttonOutlineText: {
-        color: '#1782fa',
+        color: 'black',
         fontWeight: '700',
         fontSize: 16,
     },
+    
+    
 })
