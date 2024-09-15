@@ -31,7 +31,7 @@ const LoginScreen = () => {
                 const user = userCredentials.user;
                 console.log ('Registered with: ',user.email);
             })
-            .catch((error) => {alert(error.message)}); //WEAK PASSWORD AND USED EMAIL
+            .catch((error) => {alert(error.message)}); // ALERT TO SHOW FOR WEAK PASSWORD AND USED EMAILS
     }
 
     const handleLogin = () => {
@@ -40,15 +40,13 @@ const LoginScreen = () => {
             const user = userCredentials.user;
             console.log ('Logged in with: ', user.email);
         })
-        .catch((error) => {alert(error.message)}); //WEAK PASSWORD AND USED EMAIL
+        .catch((error) => {alert(error.message)}); // ALERT TO SHOW FOR WEAK PASSWORD AND USED EMAILS
     }
 
     return (
         <KeyboardAvoidingView style = {styles.container} behavior = 'padding'>
             <View style = {styles.header}>
                 <Image source={require('../assets/icon.png')} style={styles.picLogo} />
-
-                
             </View>
             
             <View style = {styles.body}>
@@ -74,9 +72,7 @@ const LoginScreen = () => {
                         secureTextEntry 
                         value={password} 
                         onChangeText={text => setPassword(text)} /> 
-                        
-                        
-                    
+            
                 </View>
 
                 <View style={styles.buttonContainer}>

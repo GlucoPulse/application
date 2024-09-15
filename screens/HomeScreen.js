@@ -44,7 +44,7 @@ const HomeScreen = () => {
       <Tab.Screen name = "SCAN" 
         component = {ScanPage} 
         options={{
-          tabBarIcon: ({focused}) => <MaterialCommunityIcons name="fingerprint" size={28} style={styles.iconCenter} />
+          tabBarIcon: ({focused}) => <MaterialCommunityIcons name="fingerprint" size={28} style={styles.iconCenter} /> //@RUEL PA HELP SA COLORS HUEHUEHUHEU
           }}/>
       <Tab.Screen name = "CHARTS" component = {ChartsPage} 
         options={{
