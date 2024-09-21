@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
+    "@react-native-firebase/firestore": "^20.5.0",
     "@react-native-vector-icons/fontawesome": "^4.7.0-alpha.25",
     "@react-navigation/bottom-tabs": "^6.6.1",
     "@react-navigation/native": "^6.1.18",

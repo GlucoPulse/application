@@ -9,10 +9,12 @@ import GlycemicLoadPage from './GlycemicLoadPage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
+import { auth } from '../firebase'
 
 const Tab = createBottomTabNavigator();
 
-const HomeScreen = () => {
+const HomeScreen = ({navigation, route}) => {
+
   return (
     <Tab.Navigator screenOptions={{
       tabBarShowLabel: true,
@@ -36,7 +38,7 @@ const HomeScreen = () => {
         options={{
           tabBarIcon: ({focused}) => <MaterialCommunityIcons name="home" size={28} style={styles.iconsTab} color= {focused ? "#32a1d3" : "#ffffff"}/>
           }}/>
-      <Tab.Screen name = "GLYCEMIC LOAD" 
+      <Tab.Screen name = "GLYCEMIC INDEX" 
         component={GlycemicLoadPage} 
         options={{
           tabBarIcon: ({focused}) => <MaterialCommunityIcons name="food" size={28} style={styles.iconsTab} color= {focused ? "#32a1d3" : "#ffffff"} />
@@ -44,7 +46,7 @@ const HomeScreen = () => {
       <Tab.Screen name = "SCAN" 
         component = {ScanPage} 
         options={{
-          tabBarIcon: ({focused}) => <MaterialCommunityIcons name="fingerprint" size={28} style={styles.iconCenter} /> //@RUEL PA HELP SA COLORS HUEHUEHUHEU
+          tabBarIcon: ({focused}) => <MaterialCommunityIcons name="fingerprint" size={28} style={styles.iconCenter} color = {focused ? "#2244af" : "#ffffff"}/> //@RUEL PA HELP SA COLORS HUEHUEHUHEU
           }}/>
       <Tab.Screen name = "CHARTS" component = {ChartsPage} 
         options={{
@@ -55,8 +57,11 @@ const HomeScreen = () => {
           tabBarIcon: ({focused}) => <MaterialIcons name="settings" size={28} style={styles.iconsTab} color= {focused ? "#32a1d3" : "#ffffff"}/>
           }}/>
     </Tab.Navigator>
+
+    
   )
 }
+
 
 const styles = StyleSheet.create({
   iconsTab: {
@@ -77,5 +82,7 @@ const styles = StyleSheet.create({
 
 })
 
-export default HomeScreen
+export default HomeScreen ;
+
+
 

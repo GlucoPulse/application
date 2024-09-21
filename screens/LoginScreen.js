@@ -6,6 +6,7 @@ import firebaseConfig from '../firebase'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import { useEffect } from 'react';
+import { StatusBar } from 'react-native';
 
 const LoginScreen = () => {
     const [email, setEmail] = useState ('');
@@ -13,18 +14,15 @@ const LoginScreen = () => {
     const [password, setPassword] = useState ('');
 
     const navigation = useNavigation()
-   
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
-            if (user) {
-                navigation.navigate("Home")
-            }
-        })
-
+        useEffect(() => {
+            const unsubscribe = auth.onAuthStateChanged(user => {
+                if (user) {
+                    navigation.navigate("Home", {userEmail: user.email});
+                }
+            })
         return unsubscribe
     }, [] )
     
-
     const handleSignUp = () => {
         createUserWithEmailAndPassword (auth, email, password)
             .then ((userCredentials) => {
@@ -45,6 +43,7 @@ const LoginScreen = () => {
 
     return (
         <KeyboardAvoidingView style = {styles.container} behavior = 'padding'>
+            <StatusBar backgroundColor={"white"} barStyle={"dark-content"}/>
             <View style = {styles.header}>
                 <Image source={require('../assets/icon.png')} style={styles.picLogo} />
             </View>
@@ -59,12 +58,7 @@ const LoginScreen = () => {
                     <TextInput 
                         placeholder = "Email" 
                         style = {styles.input} value={email} 
-                        onChangeText={text => setEmail(text)} />      
-
-                    <TextInput 
-                        placeholder = "Username" 
-                        style = {styles.input} value={username} 
-                        onChangeText={text => setUsername(text)} />                                     
+                        onChangeText={text => setEmail(text)} />                                      
                     
                     <TextInput 
                         placeholder = "Password" 
