@@ -2,6 +2,7 @@
 import * as firebase from "firebase/app";
 import { initializeApp, getApp } from "firebase/app";
 import { getAuth, initializeAuth, getReactNativePersistence } from "firebase/auth";
+import { getFirestore, Firestore } from "firebase/firestore";
 //import firebaseConfig from "./config/firebaseConfig";
 
 
@@ -30,7 +31,9 @@ if (getApp().length === 0 ) {
 */
 const app = initializeApp (firebaseConfig);
 const auth = initializeAuth(app);
+const db = getFirestore(app);
 export {auth};
 export default firebaseConfig;
+export { db };
 
 
