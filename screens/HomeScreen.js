@@ -38,7 +38,7 @@ const HomeScreen = ({navigation, route}) => {
         options={{
           tabBarIcon: ({focused}) => <MaterialCommunityIcons name="home" size={28} style={styles.iconsTab} color= {focused ? "#32a1d3" : "#ffffff"}/>
           }}/>
-      <Tab.Screen name = "GLYCEMIC LOAD" 
+      <Tab.Screen name = "GLYCEMIC INDEX" 
         component={GlycemicLoadPage} 
         options={{
           tabBarIcon: ({focused}) => <MaterialCommunityIcons name="food" size={28} style={styles.iconsTab} color= {focused ? "#32a1d3" : "#ffffff"} />

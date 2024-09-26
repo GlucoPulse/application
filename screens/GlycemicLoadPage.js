@@ -1,9 +1,8 @@
-import { StyleSheet, Text, View, Image, TextInput, Pressable, FlatList, TouchableOpacity, Alert, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, Button, FlatList, TouchableOpacity, Alert, KeyboardAvoidingView } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'react-native';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { ToastAndroid } from 'react-native';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 const GlycemicLoadPage = () => {
   const db = getFirestore();
@@ -62,15 +61,6 @@ const GlycemicLoadPage = () => {
     ]
   )};
 
-  const moreInfo = () => {
-    Alert.alert(
-      "More info about Glycemic Index",
-      "\nSearch for a food you have recently had. After tapping on a food item, it will automatically be saved and linked to your Glycemic Load Records.", [{
-        text: 'GOT IT'
-      }]
-    )
-  }
-
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
       <TouchableOpacity style={styles.button} onPress={userChoice}>
@@ -97,7 +87,7 @@ const GlycemicLoadPage = () => {
 
       <View style={styles.header}>
         <Image source={require('../assets/word-logo-whitevar.png')} style={styles.topImage}/>
-        <Text style={styles.welcomeText}>Glycemic Load</Text>
+        <Text style={styles.welcomeText}>Glycemic Index</Text>
       </View>
 
       <View style={styles.topBody}>
@@ -106,11 +96,6 @@ const GlycemicLoadPage = () => {
           value={searchQuery}
           onChangeText={setSearchQuery} 
           style={styles.input} />
-
-        <TouchableOpacity style={styles.infoLine} onPress={moreInfo}>
-          <MaterialIcons name="info" size={22} color="#808080" style={{marginRight: 5}}/>
-          <Text style={{color: '#808080'}}>More info about Glycemic Load</Text>
-        </TouchableOpacity>
       </View>
           
       <FlatList
@@ -156,7 +141,7 @@ const styles = StyleSheet.create({
   },
   input: {
     marginTop: 20,
-    marginBottom: 15,
+    marginBottom: 20,
     backgroundColor: 'white',
     padding: 15,
     borderRadius: 15,
@@ -213,10 +198,5 @@ const styles = StyleSheet.create({
   rightColumn: {
       flex: 1,
       marginLeft: 10,
-  },
-  infoLine: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 5
   },
 });
