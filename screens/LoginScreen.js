@@ -74,8 +74,12 @@ const LoginScreen = () => {
                         <Text style ={styles.buttonText}> Login </Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress= {handleSignUp} style={[styles.button, styles.buttonOutline]}>
+                    <TouchableOpacity onPress= {handleSignUp} style={[styles.buttonReg]}>
                         <Text style ={styles.buttonOutlineText}> Register </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")} >
+                        <Text style={styles.pressFP}>Forgot Password?</Text>
                     </TouchableOpacity>
                 </View>
            
@@ -149,7 +153,8 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 10,
         alignItems: 'center',
-        marginBottom: 5
+        marginBottom: 5,
+        height: 55
     }, 
     buttonText: {
         color: 'white',
@@ -157,18 +162,25 @@ const styles = StyleSheet.create({
         fontSize: 16,
         textAlign: 'center',
     },
-    buttonOutline: {
-        marginBottom: 5,
+    buttonReg: {
         backgroundColor: 'white',
-        marginTop: 5,
-        borderColor: 'white',
-        borderWidth: 2,
-    },
+        width: '100%',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginBottom: 5,
+        height: 55
+    }, 
     buttonOutlineText: {
         color: 'black',
         fontWeight: '700',
         fontSize: 16,
     },
-    
+    pressFP: {
+        fontSize: 16,
+        marginTop: 30,
+        color: 'white',
+        textDecorationLine: 'underline'
+    }
     
 })

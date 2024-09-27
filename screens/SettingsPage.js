@@ -1,12 +1,26 @@
 import React from 'react'
 import { StatusBar, TouchableOpacity } from 'react-native'
-import { SafeAreaView, StyleSheet, Text, View, Image, Linking } from 'react-native'
+import { SafeAreaView, StyleSheet, Text, View, Image, Alert } from 'react-native'
 import { auth } from '../firebase'
 import { useNavigation } from '@react-navigation/native'
+import { sendPasswordResetEmail } from 'firebase/auth'
 
 const SettingsPage = () => {
   
   const navigation = useNavigation();
+
+  const email = auth.currentUser?.email;
+  
+  const handlePasswordReset = async () => {
+    await sendPasswordResetEmail (auth, email)
+    .then (() => Alert.alert ("Email Confirmation","Password reset email sent"))
+    .catch ((error) => {
+        Alert.alert (
+            "Error",
+            error.message
+        );
+    });
+  }
 
   const handleSignOut = () => {
     auth
@@ -15,6 +29,10 @@ const SettingsPage = () => {
         navigation.replace ("Login")
       })
       .catch(error => alert (error.message))
+  }
+
+  const showAdminPage = () => {
+    
   }
 
   return (
@@ -31,11 +49,11 @@ const SettingsPage = () => {
           <Text style={styles.buttonText}>Documentation</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={() => Linking.openURL('https://github.com/GlucoPulse')}>
-          <Text style={styles.buttonText}>Source Code</Text>
+        <TouchableOpacity style={styles.button} onPress={handlePasswordReset}>
+          <Text style={styles.buttonText}>Change Password</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={handleSignOut}>
+        <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Log out</Text>
         </TouchableOpacity>
 
