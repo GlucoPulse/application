@@ -1,11 +1,16 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { StatusBar, TouchableOpacity } from 'react-native'
 import { SafeAreaView, StyleSheet, Text, View, Image, Alert } from 'react-native'
 import { auth } from '../firebase'
 import { useNavigation } from '@react-navigation/native'
-import { sendPasswordResetEmail } from 'firebase/auth'
+import { getAuth, sendPasswordResetEmail } from 'firebase/auth'
+import { getFirestore, collection, getDocs, query, where } from 'firebase/firestore'
 
 const SettingsPage = () => {
+
+  const [isAdmin, setIsAdmin] = useState(false);
+  const db = getFirestore();
+  const auth_2 = getAuth();
   
   const navigation = useNavigation();
 
@@ -31,9 +36,26 @@ const SettingsPage = () => {
       .catch(error => alert (error.message))
   }
 
-  const showAdminPage = () => {
-    
-  }
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const q = query(collection(db, 'adminTag'), 
+        where('userID', '==', user.uid), 
+        where('tagIfAdmin', '==', true));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          setIsAdmin(true);
+        }
+      }
+    };
+    checkAdminStatus();
+  }, [auth, db]);
+
+
+
+
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -53,10 +75,17 @@ const SettingsPage = () => {
           <Text style={styles.buttonText}>Change Password</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleSignOut}>
           <Text style={styles.buttonText}>Log out</Text>
         </TouchableOpacity>
 
+      </View>
+
+      <View>
+        {isAdmin && 
+          <TouchableOpacity style={styles.button} onPress={() => {}}>
+            <Text style={styles.buttonText}>Admin Page</Text>
+          </TouchableOpacity>} 
       </View>
     </SafeAreaView>
   )
