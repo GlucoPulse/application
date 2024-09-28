@@ -9,28 +9,7 @@ import {
 } from "react-native";
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
-const Stack = createNativeStackNavigator();
-
-const addGIDb = () => {
-    return (
-        <SafeAreaView style={styles.container}>
-        <StatusBar backgroundColor={"#2244af"} barStyle={"light-content"} />
-  
-        <View style={styles.header}>
-          <Image
-            source={require("../assets/word-logo-whitevar.png")}
-            style={styles.topImage}
-          />
-          <Text style={styles.welcomeText}>Admin Panel</Text>
-        </View>
-  
-
-      </SafeAreaView>
-    );
-};
+import { Firestore, getFirestore } from "firebase/firestore";
 
 const AdminPage = () => {
 
@@ -49,7 +28,7 @@ const AdminPage = () => {
             </View>
 
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} >
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("AddGI")}>
                     <Text style={styles.buttonText}>Add to Glycemic Index Database</Text>
                 </TouchableOpacity>
         

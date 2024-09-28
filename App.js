@@ -7,7 +7,7 @@ import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import ForgotPasswordPage from "./screens/ForgotPasswordPage";
 import AdminPage from "./screens/AdminPage";
-
+import AddGLValPage from "./screens/AddGLValPage";
 
 const Stack = createNativeStackNavigator();
 
@@ -35,8 +35,17 @@ export default function App() {
           component={AdminPage}
           options={{ headerShown: false }}
         />
-      </Stack.Navigator>
-    </NavigationContainer>
+        <Stack.Screen
+          name="AddGI"
+          component={AddGLValPage}
+          options={{ 
+			headerShown: true, 
+		  	title: "", 
+			headerTransparent: true, 
+			headerTintColor: 'white',
+			}} />
+	</Stack.Navigator>
+	</NavigationContainer> 
   );
 }
 
