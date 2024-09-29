@@ -40,8 +40,8 @@ const AdminPage = () => {
           <Text style={styles.buttonText}>Edit Glycemic Load Database</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Add Users as Admin</Text>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("AddAdmin")}>
+          <Text style={styles.buttonText}>Administrator Users</Text>
         </TouchableOpacity>
 
         <TouchableOpacity

@@ -62,7 +62,7 @@ const AddGLValPage = () => {
           source={require("../assets/word-logo-whitevar.png")}
           style={styles.topImage}
         />
-        <Text style={styles.welcomeText}>Add Glucose Load Dishes</Text>
+        <Text style={styles.welcomeText}>Add Glycemic Load Dishes</Text>
       </View>
 
       <View style={styles.body}>
