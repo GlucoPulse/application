@@ -12,7 +12,6 @@ import { StatusBar } from "react-native";
 import React, { useState } from "react";
 import { addDoc, collection, getFirestore } from "firebase/firestore";
 import { TouchableOpacity } from "react-native";
-import { Input } from "@rneui/base";
 
 const AddGLValPage = () => {
   const [description, setDescription] = useState("");
@@ -25,10 +24,17 @@ const AddGLValPage = () => {
   const db = getFirestore();
 
   const loadData = async () => {
-	if (!description || !food || !glycemicIndexV || !glycemicLoadV || !imageUrl || !servingSize) {
-		Alert.alert ("Warning", "Please fill in all fields.");
-		return;
-	}
+    if (
+      !description ||
+      !food ||
+      !glycemicIndexV ||
+      !glycemicLoadV ||
+      !imageUrl ||
+      !servingSize
+    ) {
+      Alert.alert("Warning", "Please fill in all fields.");
+      return;
+    }
 
     try {
       const docRef = await addDoc(collection(db, "glycemicLoad"), {
@@ -39,11 +45,11 @@ const AddGLValPage = () => {
         image_url: imageUrl,
         serving_size: servingSize,
       });
-	  Alert.alert("Success", `Document added with ID: ${docRef.id}`);
+      Alert.alert("Success", `Document added with ID: ${docRef.id}`);
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
-	  Alert.alert("Error", "There was an error adding the document.");
+      Alert.alert("Error", "There was an error adding the document.");
     }
   };
 
@@ -96,10 +102,10 @@ const AddGLValPage = () => {
           value={servingSize}
           onChangeText={setServingSize}
         />
-        
-		<TouchableOpacity onPress={loadData} style={styles.buttonStyle}>
-			<Text style={styles.buttonText}>Add Value</Text>
-		</TouchableOpacity>
+
+        <TouchableOpacity onPress={loadData} style={styles.buttonStyle}>
+          <Text style={styles.buttonText}>Add Value</Text>
+        </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
@@ -116,7 +122,7 @@ const styles = StyleSheet.create({
   header: {
     width: "100%",
     height: "15%",
-    backgroundColor: "#2144af",
+    backgroundColor: "#2244af",
     borderBottomRightRadius: 75,
     justifyContent: "center",
     alignItems: "center",
@@ -148,7 +154,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonStyle: {
-	backgroundColor: "#2144af",
+    backgroundColor: "#2244af",
     width: 300,
     height: 55,
     padding: 15,
@@ -157,8 +163,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   buttonText: {
-	color: 'white',
-	fontWeight: "bold",
-	fontSize: 16
-  }
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
 });

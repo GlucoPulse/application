@@ -94,10 +94,10 @@ const SettingsPage = () => {
       <View>
         {isAdmin && (
           <TouchableOpacity
-            style={styles.button}
+            style={styles.buttonAdmin}
             onPress={() => navigation.navigate("Admin")}
           >
-            <Text style={styles.buttonText}>Admin Page</Text>
+            <Text style={styles.buttonTextAdmin}>Admin Page</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -148,6 +148,21 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "black",
+    fontWeight: "700",
+    fontSize: 16,
+    textAlign: "center",
+  },
+  buttonAdmin: {
+    backgroundColor: "#2144af",
+    width: 300,
+    height: 55,
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  buttonTextAdmin: {
+    color: "white",
     fontWeight: "700",
     fontSize: 16,
     textAlign: "center",

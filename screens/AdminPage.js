@@ -9,38 +9,49 @@ import {
 } from "react-native";
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
-import { Firestore, getFirestore } from "firebase/firestore";
 
 const AdminPage = () => {
+  const navigation = useNavigation();
 
-    const navigation = useNavigation ();
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor={"#2244af"} barStyle={"light-content"} />
 
-    return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar backgroundColor={"#2244af"} barStyle={"light-content"} />
-    
-            <View style={styles.header}>
-            <Image
-                source={require("../assets/word-logo-whitevar.png")}
-                style={styles.topImage}
-            />
-            <Text style={styles.welcomeText}>Admin Panel</Text>
-            </View>
+      <View style={styles.header}>
+        <Image
+          source={require("../assets/word-logo-whitevar.png")}
+          style={styles.topImage}
+        />
+        <Text style={styles.welcomeText}>Admin Panel</Text>
+      </View>
 
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("AddGI")}>
-                    <Text style={styles.buttonText}>Add to Glycemic Index Database</Text>
-                </TouchableOpacity>
-        
-                <TouchableOpacity style={styles.button}>
-                    <Text style={styles.buttonText}>Add Users as Admin</Text>
-                </TouchableOpacity>
-        
-                <TouchableOpacity style={styles.buttonHome} onPress={() => navigation.navigate('HOME')}>
-                    <Text style={styles.buttonTextHome}>Go Back Home</Text>
-                </TouchableOpacity>
-            </View>
-        </SafeAreaView>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("AddGL")}
+        >
+          <Text style={styles.buttonText}>Add to Glycemic Load Database</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("EditGL")}
+        >
+          <Text style={styles.buttonText}>Edit Glycemic Load Database</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Add Users as Admin</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.buttonHome}
+          onPress={() => navigation.navigate("HOME")}
+        >
+          <Text style={styles.buttonTextHome}>Go Back Home</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -55,7 +66,7 @@ const styles = StyleSheet.create({
   header: {
     width: "100%",
     height: "15%",
-    backgroundColor: "#2144af",
+    backgroundColor: "#2244af",
     borderBottomRightRadius: 75,
     justifyContent: "center",
     alignItems: "center",
@@ -106,5 +117,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
   },
-
 });

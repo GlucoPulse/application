@@ -8,6 +8,7 @@ import HomeScreen from "./screens/HomeScreen";
 import ForgotPasswordPage from "./screens/ForgotPasswordPage";
 import AdminPage from "./screens/AdminPage";
 import AddGLValPage from "./screens/AddGLValPage";
+import EditGLValPage from "./screens/EditGLValPage";
 
 const Stack = createNativeStackNavigator();
 
@@ -36,16 +37,27 @@ export default function App() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="AddGI"
+          name="AddGL"
           component={AddGLValPage}
-          options={{ 
-			headerShown: true, 
-		  	title: "", 
-			headerTransparent: true, 
-			headerTintColor: 'white',
-			}} />
-	</Stack.Navigator>
-	</NavigationContainer> 
+          options={{
+            headerShown: true,
+            title: "",
+            headerTransparent: true,
+            headerTintColor: "white",
+          }}
+        />
+        <Stack.Screen
+          name="EditGL"
+          component={EditGLValPage}
+          options={{
+            headerShown: true,
+            title: "",
+            headerTransparent: true,
+            headerTintColor: "white",
+          }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 

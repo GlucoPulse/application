@@ -151,11 +151,13 @@ const GlycemicLoadPage = () => {
         </TouchableOpacity>
       </View>
 
+      <View style={styles.body}>
       <FlatList
         data={filteredDishes}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
       />
+      </View>
     </KeyboardAvoidingView>
   );
 };
@@ -256,4 +258,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 5,
   },
+  body: {
+  height:  "65%",
+  }
+  
 });
