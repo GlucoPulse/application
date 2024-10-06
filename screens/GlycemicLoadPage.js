@@ -11,23 +11,32 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "react-native";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { getFirestore, collection, getDocs, addDoc } from "firebase/firestore";
 import { ToastAndroid } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { getAuth } from "firebase/auth";
 
 const GlycemicLoadPage = () => {
+  const auth = getAuth();
   const db = getFirestore();
+
+  const user = auth.currentUser;
+  const userID = user.uid;
 
   const [dishes, setDishes] = useState([]);
   const [filteredDishes, setFilteredDishes] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-
   const getData = async () => {
     const queryRef = collection(db, "glycemicLoad");
     const querySnapshot = await getDocs(queryRef);
     const fetchedDishes = [];
     querySnapshot.forEach((doc) => {
-      fetchedDishes.push({ id: doc.id, ...doc.data() });
+      const data = doc.data();
+      fetchedDishes.push({
+        id: doc.id,
+        ...data,
+        glycemic_load: data.glycemic_load.toString(), // Ensure glycemic_load is a string
+      });
     });
     setDishes(fetchedDishes);
     setFilteredDishes(fetchedDishes);
@@ -48,7 +57,7 @@ const GlycemicLoadPage = () => {
     }
   }, [searchQuery, dishes]);
 
-  const userChoice = () => {
+  const userChoice = (glycemicLoadValue) => {
     Alert.alert("Save Value", "Do you want to save this value?", [
       {
         text: "No",
@@ -62,10 +71,12 @@ const GlycemicLoadPage = () => {
       {
         text: "Yes",
         onPress: async () => {
-          // Use async for potential saving operations
           try {
-            // Save the value logic here (e.g., network request, local storage)
-            //await saveValue(); // Replace with your actual saving logic
+            await addDoc(collection(db, "valGLUser"), {
+              glycemicLoad: glycemicLoadValue, // Now it's a number
+              timestamp: new Date(),
+              userid: userID,
+            });
             ToastAndroid.show(
               "Value Saved: The value has been saved successfully.",
               ToastAndroid.SHORT
@@ -96,7 +107,10 @@ const GlycemicLoadPage = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
-      <TouchableOpacity style={styles.button} onPress={userChoice}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => userChoice(parseInt(item.glycemic_load))}
+      >
         <View style={styles.rightColumn}>
           <Text style={styles.foodText}>{item.food}</Text>
           <Text style={styles.descriptionText}>{item.description}</Text>
@@ -108,7 +122,7 @@ const GlycemicLoadPage = () => {
             Glycemic Index: {item.glycemic_index}
           </Text>
           <Text style={styles.loadText}>
-            Glycemic Load: {item.glycemic_load}
+            Glycemic Load: {parseInt(item.glycemic_load)}
           </Text>
           <Text style={styles.loadText}>
             Serving Size: {item.serving_size}g
@@ -152,11 +166,11 @@ const GlycemicLoadPage = () => {
       </View>
 
       <View style={styles.body}>
-      <FlatList
-        data={filteredDishes}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-      />
+        <FlatList
+          data={filteredDishes}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+        />
       </View>
     </KeyboardAvoidingView>
   );
@@ -259,7 +273,6 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   body: {
-  height:  "65%",
-  }
-  
+    height: "65%",
+  },
 });

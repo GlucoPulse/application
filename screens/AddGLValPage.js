@@ -80,6 +80,7 @@ const AddGLValPage = () => {
         />
         <TextInput
           placeholder="Enter Food Glycemic Index Value"
+          inputMode="numeric"
           style={styles.input}
           value={glycemicIndexV}
           onChangeText={setGlycemicIndexV}
@@ -87,6 +88,7 @@ const AddGLValPage = () => {
         <TextInput
           placeholder="Enter Food Glycemic Load Value"
           style={styles.input}
+          inputMode="numeric"
           value={glycemicLoadV}
           onChangeText={setGlycemicLoadV}
         />
@@ -98,6 +100,7 @@ const AddGLValPage = () => {
         />
         <TextInput
           placeholder="Enter Food Serving Size(g)"
+          inputMode="numeric"
           style={styles.input}
           value={servingSize}
           onChangeText={setServingSize}

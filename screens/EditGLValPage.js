@@ -124,6 +124,7 @@ const EditGLValPage = () => {
             <TextInput
               style={styles.input}
               placeholder="Glycemic Index"
+              inputMode="numeric"
               value={glycemicIndex}
               onChangeText={setGlycemicIndex}
               keyboardType="numeric"
@@ -131,6 +132,7 @@ const EditGLValPage = () => {
             <TextInput
               style={styles.input}
               placeholder="Glycemic Load"
+              inputMode="numeric"
               value={glycemicLoad}
               onChangeText={setGlycemicLoad}
               keyboardType="numeric"
@@ -138,6 +140,7 @@ const EditGLValPage = () => {
             <TextInput
               style={styles.input}
               placeholder="Serving Size"
+              inputMode="numeric"
               value={servingSize}
               onChangeText={setServingSize}
               keyboardType="numeric"
