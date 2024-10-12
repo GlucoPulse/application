@@ -95,7 +95,7 @@ const GlycemicLoadPage = () => {
 
   const moreInfo = () => {
     Alert.alert(
-      "More info about Glycemic Index",
+      "More info about Glycemic Load",
       "\nSearch for a food you have recently had. After tapping on a food item, it will automatically be saved and linked to your Glycemic Load Records.",
       [
         {
@@ -118,15 +118,15 @@ const GlycemicLoadPage = () => {
 
         <View style={styles.leftColumn}>
           <Image source={{ uri: item.image_url }} style={styles.image} />
+
           <Text style={styles.indexText}>
-            Glycemic Index: {item.glycemic_index}
-          </Text>
-          <Text style={styles.loadText}>
             Glycemic Load: {parseInt(item.glycemic_load)}
           </Text>
+
           <Text style={styles.loadText}>
-            Serving Size: {item.serving_size}g
+            Glycemic Index: {item.glycemic_index}
           </Text>
+          <Text style={styles.loadText}>Serving Size: {item.serving_size}</Text>
         </View>
       </TouchableOpacity>
     </View>
