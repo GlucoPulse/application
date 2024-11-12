@@ -220,6 +220,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     width: "90%",
+    height: "100%",
   },
   infoLine: {
     flexDirection: "row",

@@ -10,6 +10,7 @@ import AdminPage from "./screens/AdminPage";
 import AddGLValPage from "./screens/AddGLValPage";
 import EditGLValPage from "./screens/EditGLValPage";
 import AddAdminPage from "./screens/AddAdminPage";
+import DocumentationPage from "./screens/DocumentationPage";
 
 const Stack = createNativeStackNavigator();
 
@@ -60,6 +61,16 @@ export default function App() {
         <Stack.Screen
           name="AddAdmin"
           component={AddAdminPage}
+          options={{
+            headerShown: true,
+            title: "",
+            headerTransparent: true,
+            headerTintColor: "white",
+          }}
+        />
+        <Stack.Screen
+          name="Documentation"
+          component={DocumentationPage}
           options={{
             headerShown: true,
             title: "",

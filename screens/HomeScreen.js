@@ -76,7 +76,7 @@ const HomeScreen = ({ navigation, route }) => {
         }}
       />
       <Tab.Screen
-        name="CHARTS"
+        name="HISTORY"
         component={ChartsPage}
         options={{
           tabBarIcon: ({ focused }) => (

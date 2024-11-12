@@ -96,7 +96,7 @@ const GlycemicLoadPage = () => {
   const moreInfo = () => {
     Alert.alert(
       "More info about Glycemic Load",
-      "\nSearch for a food you have recently had. After tapping on a food item, it will automatically be saved and linked to your Glycemic Load Records.",
+      "Glycemic Load measures how much a food will raise a person’s blood glucose level after eating it, considering both the amount of carbohydrates and the glycemic index of the food. It’s a more accurate way to understand a food’s impact on blood sugar than GI alone.\n\nSearch for a food you have recently had. After tapping on a food item, it will automatically be saved and linked to your Glycemic Load Records.",
       [
         {
           text: "GOT IT",

@@ -1,4 +1,17 @@
 {
+  "plugins": [
+    [
+      "react-native-ble-plx",
+      {
+        "isBackgroundEnabled": true,
+        "modes": [
+          "peripheral",
+          "central"
+        ],
+        "bluetoothAlwaysPermission": "Allow $(PRODUCT_NAME) to connect to bluetooth devices"
+      }
+    ]
+  ],
   "expo": {
     "name": "application",
     "slug": "application",
@@ -28,6 +41,9 @@
       "eas": {
         "projectId": "2a59dc4b-5e84-4683-984f-fbf55edba045"
       }
-    }
+    },
+    "plugins": [
+      "react-native-ble-plx"
+    ]
   }
 }

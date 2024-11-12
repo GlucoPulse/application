@@ -15,14 +15,22 @@ import {
   Image,
   StyleSheet,
   StatusBar,
-  TouchableOpacity,
+  Button,
   ScrollView,
+  Platform,
+  TouchableOpacity,
 } from "react-native";
 import Picker from "react-native-picker-select";
 import Entypo from "@expo/vector-icons/Entypo";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
+import * as DocumentPicker from "expo-document-picker";
+import * as XLSX from "xlsx";
 
 const ChartsPage = () => {
-  const [lineData, setLineData] = useState([]);
+  const [valGLUserLineData, setValGLUserLineData] = useState([]);
+  const [userGLUCOSELineData, setUserGLUCOSELineData] = useState([]);
+  const [userSPO2LineData, setUserSPO2LineData] = useState([]);
   const [timeRange, setTimeRange] = useState("hour");
 
   useEffect(() => {
@@ -32,10 +40,11 @@ const ChartsPage = () => {
       const user = auth.currentUser;
 
       if (user) {
-        const q = collection(db, "valGLUser");
-        const querySnapshot = await getDocs(q);
+        // Fetch data from valGLUser collection
+        const valGLUserQuery = collection(db, "valGLUser");
+        const valGLUserSnapshot = await getDocs(valGLUserQuery);
 
-        const data = querySnapshot.docs
+        const valGLUserData = valGLUserSnapshot.docs
           .map((doc) => {
             const { glycemicLoad, timestamp, userid } = doc.data();
             const date = new Date(
@@ -49,59 +58,150 @@ const ChartsPage = () => {
           })
           .filter((item) => item.userid === user.uid); // Filter by user ID
 
+        // Fetch data from UserHealthData collection for userGLUCOSE
+        const userHealthDataQuery = collection(db, "UserHealthData");
+        const userHealthDataSnapshot = await getDocs(userHealthDataQuery);
+
+        const userGLUCOSEData = userHealthDataSnapshot.docs
+          .map((doc) => {
+            const { userGLUCOSE, HDtimestamp, userUserID } = doc.data();
+            const date = new Date(
+              HDtimestamp.seconds * 1000 + HDtimestamp.nanoseconds / 1000000
+            );
+            return {
+              userGLUCOSE,
+              timestamp: date,
+              userUserID,
+            };
+          })
+          .filter((item) => item.userUserID === user.uid); // Filter by user ID
+
+        // Fetch data from UserHealthData collection for userSPO2
+        const userSPO2Data = userHealthDataSnapshot.docs
+          .map((doc) => {
+            const { userSPO2, HDtimestamp, userUserID } = doc.data();
+            const date = new Date(
+              HDtimestamp.seconds * 1000 + HDtimestamp.nanoseconds / 1000000
+            );
+            return {
+              userSPO2,
+              timestamp: date,
+              userUserID,
+            };
+          })
+          .filter((item) => item.userUserID === user.uid); // Filter by user ID
+
         const now = new Date();
-        let filteredData;
+        let filteredValGLUserData;
+        let filteredUserGLUCOSEData;
+        let filteredUserSPO2Data;
 
         switch (timeRange) {
           case "hour":
-            filteredData = data.filter(
+            filteredValGLUserData = valGLUserData.filter(
+              (item) => now - item.timestamp < 3600000
+            ); // <1 hour
+            filteredUserGLUCOSEData = userGLUCOSEData.filter(
+              (item) => now - item.timestamp < 3600000
+            ); // <1 hour
+            filteredUserSPO2Data = userSPO2Data.filter(
               (item) => now - item.timestamp < 3600000
             ); // <1 hour
             break;
           case "day":
-            filteredData = data.filter(
+            filteredValGLUserData = valGLUserData.filter(
+              (item) => now - item.timestamp < 86400000
+            ); // <24 hours
+            filteredUserGLUCOSEData = userGLUCOSEData.filter(
+              (item) => now - item.timestamp < 86400000
+            ); // <24 hours
+            filteredUserSPO2Data = userSPO2Data.filter(
               (item) => now - item.timestamp < 86400000
             ); // <24 hours
             break;
           case "week":
-            filteredData = data.filter(
+            filteredValGLUserData = valGLUserData.filter(
+              (item) => now - item.timestamp < 604800000
+            ); // <168 hours
+            filteredUserGLUCOSEData = userGLUCOSEData.filter(
+              (item) => now - item.timestamp < 604800000
+            ); // <168 hours
+            filteredUserSPO2Data = userSPO2Data.filter(
               (item) => now - item.timestamp < 604800000
             ); // <168 hours
             break;
           case "month":
-            filteredData = data.filter(
+            filteredValGLUserData = valGLUserData.filter(
+              (item) => now - item.timestamp < 2592000000
+            ); // <30 days
+            filteredUserGLUCOSEData = userGLUCOSEData.filter(
+              (item) => now - item.timestamp < 2592000000
+            ); // <30 days
+            filteredUserSPO2Data = userSPO2Data.filter(
               (item) => now - item.timestamp < 2592000000
             ); // <30 days
             break;
           default:
-            filteredData = data;
+            filteredValGLUserData = valGLUserData;
+            filteredUserGLUCOSEData = userGLUCOSEData;
+            filteredUserSPO2Data = userSPO2Data;
         }
 
         // Sort the filtered data by timestamp
-        filteredData.sort((a, b) => a.timestamp - b.timestamp);
+        filteredValGLUserData.sort((a, b) => a.timestamp - b.timestamp);
+        filteredUserGLUCOSEData.sort((a, b) => a.timestamp - b.timestamp);
+        filteredUserSPO2Data.sort((a, b) => a.timestamp - b.timestamp);
 
-        const formattedData = filteredData.map((item) => {
-          let label;
-          if (timeRange === "week" || timeRange === "month") {
-            label = item.timestamp.toLocaleDateString([], {
-              month: "2-digit",
-              day: "2-digit",
-            });
-          } else {
-            label = item.timestamp.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-          }
+        const formatData = (data, timeRange) => {
+          return data.map((item) => {
+            let label;
+            if (timeRange === "week" || timeRange === "month") {
+              label = item.timestamp.toLocaleDateString([], {
+                month: "2-digit",
+                day: "2-digit",
+              });
+            } else {
+              label = item.timestamp.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+            }
 
-          return {
+            return {
+              value: item.value,
+              dataPointText: item.value.toString(),
+              label: label,
+            };
+          });
+        };
+
+        const formattedValGLUserData = formatData(
+          filteredValGLUserData.map((item) => ({
             value: item.glycemicLoad,
-            dataPointText: item.glycemicLoad.toString(),
-            label: label,
-          };
-        });
+            timestamp: item.timestamp,
+          })),
+          timeRange
+        );
 
-        setLineData(formattedData);
+        const formattedUserGLUCOSEData = formatData(
+          filteredUserGLUCOSEData.map((item) => ({
+            value: item.userGLUCOSE,
+            timestamp: item.timestamp,
+          })),
+          timeRange
+        );
+
+        const formattedUserSPO2Data = formatData(
+          filteredUserSPO2Data.map((item) => ({
+            value: item.userSPO2,
+            timestamp: item.timestamp,
+          })),
+          timeRange
+        );
+
+        setValGLUserLineData(formattedValGLUserData);
+        setUserGLUCOSELineData(formattedUserGLUCOSEData);
+        setUserSPO2LineData(formattedUserSPO2Data);
       } else {
         console.log("No user is currently authenticated.");
       }
@@ -109,6 +209,124 @@ const ChartsPage = () => {
 
     fetchData();
   }, [timeRange]);
+
+  const saveToXLSX = async () => {
+    const db = getFirestore();
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      // Fetch data from valGLUser collection
+      const valGLUserQuery = collection(db, "valGLUser");
+      const valGLUserSnapshot = await getDocs(valGLUserQuery);
+      const valGLUserData = valGLUserSnapshot.docs
+        .map((doc) => {
+          const { glycemicLoad, timestamp, userid } = doc.data();
+          const date = new Date(
+            timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000
+          );
+          return {
+            glycemicLoad,
+            timestamp: date,
+            userid,
+          };
+        })
+        .filter((item) => item.userid === user.uid);
+
+      // Sort valGLUser data by timestamp
+      valGLUserData.sort((a, b) => a.timestamp - b.timestamp);
+
+      // Prepare valGLUser data for the worksheet
+      const valGLUserHeader = ["Timestamp", "Glycemic Load"];
+      const valGLUserRows = valGLUserData.map((item) => [
+        item.timestamp.toLocaleString(),
+        item.glycemicLoad,
+      ]);
+
+      const valGLUserSheetData = [valGLUserHeader, ...valGLUserRows];
+      const valGLUserSheet = XLSX.utils.aoa_to_sheet(valGLUserSheetData);
+
+      // Fetch data from UserHealthData collection
+      const userHealthDataQuery = collection(db, "UserHealthData");
+      const userHealthDataSnapshot = await getDocs(userHealthDataQuery);
+      const userHealthData = userHealthDataSnapshot.docs
+        .map((doc) => {
+          const { HDtimestamp, userGLUCOSE, userSPO2, userUserID } = doc.data();
+          const date = new Date(
+            HDtimestamp.seconds * 1000 + HDtimestamp.nanoseconds / 1000000
+          );
+          return {
+            HDtimestamp: date,
+            userGLUCOSE,
+            userSPO2,
+            userUserID,
+          };
+        })
+        .filter((item) => item.userUserID === user.uid);
+
+      // Sort UserHealthData by HDtimestamp
+      userHealthData.sort((a, b) => a.HDtimestamp - b.HDtimestamp);
+
+      // Prepare UserHealthData for the worksheet
+      const userHealthDataHeader = ["Timestamp", "Glucose", "SPO2"];
+      const userHealthDataRows = userHealthData.map((item) => [
+        item.HDtimestamp.toLocaleString(),
+        item.userGLUCOSE,
+        item.userSPO2,
+      ]);
+
+      const userHealthDataSheetData = [
+        userHealthDataHeader,
+        ...userHealthDataRows,
+      ];
+      const userHealthDataSheet = XLSX.utils.aoa_to_sheet(
+        userHealthDataSheetData
+      );
+
+      // Log the data to ensure it's being fetched correctly
+      console.log("valGLUserData:", valGLUserData);
+      console.log("userHealthData:", userHealthData);
+
+      // Create a new workbook and append both sheets
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, valGLUserSheet, "Glycemic Load");
+      XLSX.utils.book_append_sheet(
+        workbook,
+        userHealthDataSheet,
+        "User Health Data"
+      );
+
+      // Write the workbook to a file
+      const wbout = XLSX.write(workbook, { type: "base64", bookType: "xlsx" });
+      const path = FileSystem.documentDirectory + "GlucoPulse User Data.xlsx";
+      await FileSystem.writeAsStringAsync(path, wbout, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      console.log("Excel file saved at:", path);
+
+      // Share the Excel file and let the user choose where to save
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(path);
+      } else {
+        console.log("Sharing is not available on this device");
+      }
+
+      // Open document picker and save to the chosen directory
+      const result = await DocumentPicker.getDocumentAsync({
+        copyToCacheDirectory: true,
+      });
+      if (result.type === "success") {
+        const newPath = result.uri;
+        await FileSystem.moveAsync({
+          from: path,
+          to: newPath,
+        });
+        console.log("Excel file moved to:", newPath);
+      }
+    } else {
+      console.log("No user is currently authenticated.");
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -119,7 +337,7 @@ const ChartsPage = () => {
           source={require("../assets/word-logo-whitevar.png")}
           style={styles.topImage}
         />
-        <Text style={styles.welcomeText}>Scan</Text>
+        <Text style={styles.welcomeText}>History</Text>
       </View>
 
       <View style={styles.body}>
@@ -142,9 +360,9 @@ const ChartsPage = () => {
                 name="triangle-down"
                 size={24}
                 color="gray"
-                marginTop={17}
+                marginTop={26}
                 styl={styles.iconDD}
-                marginRight={10}
+                marginRight={15}
               />
             );
           }}
@@ -157,9 +375,20 @@ const ChartsPage = () => {
 
       <View style={styles.body2}>
         <ScrollView>
-          <Text style={styles.label}> Glycemic Load History Chart</Text>
+          <View
+            style={{
+              justifyContent: "center",
+              alignContent: "center",
+              alignSelf: "center",
+            }}
+          >
+            <TouchableOpacity style={styles.button} onPress={saveToXLSX}>
+              <Text style={styles.buttonText}>Export to Spreadsheet</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={[styles.label]}> Glycemic Load History Chart</Text>
           <LineChart
-            data={lineData}
+            data={valGLUserLineData}
             initialSpacing={30}
             spacing={65}
             textColor1="black"
@@ -185,11 +414,65 @@ const ChartsPage = () => {
             )}
           />
 
-          <Text style={styles.label}>Glucose Level History Chart</Text>
+          <Text style={styles.labelB}>Glucose Level History Chart</Text>
 
-          <Text style={styles.label}>
+          <LineChart
+            data={userGLUCOSELineData}
+            initialSpacing={30}
+            spacing={65}
+            textColor1="black"
+            textShiftY={-8}
+            textShiftX={-10}
+            textFontSize={13}
+            width={300}
+            //hideYAxisText
+            showTextOnFocus
+            showStripOnFocus
+            focusedDataPointColor={"#32a1d3"}
+            dataPointsColor="#d71c22"
+            focusEnabled
+            showVerticalLines
+            verticalLinesColor="#ccc"
+            color="#2244af"
+            focusedCustomDataPoint={(dataPoint) => (
+              <View style={styles.focusedDataPoint}>
+                <Text style={styles.focusedDataPointText}>
+                  {dataPoint.value} - {dataPoint.label}
+                </Text>
+              </View>
+            )}
+          />
+
+          <Text style={styles.labelB}>
             Oxygen Saturation Level History Chart
           </Text>
+
+          <LineChart
+            data={userSPO2LineData}
+            initialSpacing={30}
+            spacing={65}
+            textColor1="black"
+            textShiftY={-8}
+            textShiftX={-10}
+            textFontSize={13}
+            width={300}
+            //hideYAxisText
+            showTextOnFocus
+            showStripOnFocus
+            focusedDataPointColor={"#32a1d3"}
+            dataPointsColor="#d71c22"
+            focusEnabled
+            showVerticalLines
+            verticalLinesColor="#ccc"
+            color="#2244af"
+            focusedCustomDataPoint={(dataPoint) => (
+              <View style={styles.focusedDataPoint}>
+                <Text style={styles.focusedDataPointText}>
+                  {dataPoint.value} - {dataPoint.label}
+                </Text>
+              </View>
+            )}
+          />
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -223,6 +506,7 @@ const styles = StyleSheet.create({
   body: {
     width: "80%",
     marginTop: 15,
+    justifyContent: "center",
   },
   body2: {
     width: "90%",
@@ -259,6 +543,39 @@ const styles = StyleSheet.create({
   },
   focusedDataPointText: {
     color: "black",
+  },
+  buttonContainer: {
+    width: "60%",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 40,
+  },
+  button: {
+    backgroundColor: "#afd3e5",
+    width: 329,
+    height: 55,
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  buttonText: {
+    color: "black",
+    fontWeight: "700",
+    fontSize: 16,
+    textAlign: "center",
+  },
+  labelB: {
+    fontSize: 20,
+    fontWeight: "bold",
+    alignSelf: "center",
+    marginBottom: 10,
+    marginTop: 20,
   },
 });
 
