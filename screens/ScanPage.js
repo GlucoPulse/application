@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Button,
   ToastAndroid,
+  Alert,
 } from "react-native";
 import { StatusBar } from "react-native";
 import React from "react";
@@ -20,7 +21,8 @@ import {
   onValue,
 } from "firebase/database";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
-import { getAuth } from "firebase/auth"; // Correct import for Firebase Auth
+import { getAuth } from "firebase/auth";
+import * as IntentLauncher from "expo-intent-launcher";
 
 const ScanPage = () => {
   const database = getDatabase();
@@ -83,21 +85,157 @@ const ScanPage = () => {
     }
   };
 
+  const showAlert = () => {
+    Alert.alert(
+      "Instructions",
+      "This will open the Wi-Fi settings which allows GlucoPulse to connect to internet. \n\nClick GlucoPulse_AP to change the Wi-Fi credentials of the GlucoPulse device.\n\nKeep in mind that you should revert back to your original Wi-Fi connection of your phone to garner data.",
+      [
+        {
+          text: "OK",
+          onPress: () =>
+            IntentLauncher.startActivityAsync(
+              IntentLauncher.ActivityAction.WIFI_SETTINGS
+            ),
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
   return (
-    <View>
+    <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor={"#2244af"} barStyle={"light-content"} />
+
+      <View style={styles.header}>
+        <Image
+          source={require("../assets/word-logo-whitevar.png")}
+          style={styles.topImage}
+        />
+        <Text style={styles.welcomeText}>Settings</Text>
+      </View>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={showAlert}>
+          <Text
+            style={{
+              color: "black",
+              fontWeight: "bold",
+              fontSize: 16,
+              textAlign: "center",
+            }}
+          >
+            Connect to GlucoPulse Device
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       {latestEntry && (
-        <View>
-          <Text>BPM: {latestEntry.bpm}</Text>
-          <Text>Glucose: {latestEntry.glucose}</Text>
-          <Text>SPO2: {latestEntry.spo2}</Text>
+        <View style={styles.dataContainer}>
+          <View style={styles.dataBox}>
+            <Text style={styles.dataLabel}>Glucose</Text>
+            <Text style={styles.dataValue}>{latestEntry.glucose} mg/dL</Text>
+          </View>
+          <View style={styles.dataBox}>
+            <Text style={styles.dataLabel}>SPO2</Text>
+            <Text style={styles.dataValue}>{latestEntry.spo2}%</Text>
+          </View>
         </View>
       )}
-      <Button
-        title="Save to Profile"
-        onPress={() => saveToFirestore(latestEntry)}
-      />
-    </View>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => saveToFirestore(latestEntry)}
+        >
+          <Text
+            style={{
+              color: "black",
+              fontWeight: "bold",
+              fontSize: 16,
+              textAlign: "center",
+            }}
+          >
+            Save Entry to Profile
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 };
 
 export default ScanPage;
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "white",
+    alignItems: "center",
+    flex: 1,
+  },
+  header: {
+    width: "100%",
+    height: "15%",
+    backgroundColor: "#2144af",
+    borderBottomRightRadius: 75,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  topImage: {
+    width: 250,
+    height: 50,
+  },
+  welcomeText: {
+    color: "white",
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 35,
+  },
+  buttonContainer: {
+    width: "60%",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 75,
+  },
+  button: {
+    backgroundColor: "#afd3e5",
+    width: 300,
+    height: 55,
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  dataContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 20,
+    width: "80%",
+  },
+  dataBox: {
+    backgroundColor: "#e0f7fa",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+    width: "45%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+    marginTop: 65,
+    marginBottom: 65,
+  },
+  dataLabel: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#2144af",
+  },
+  dataValue: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "black",
+  },
+});

@@ -18,11 +18,11 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import { getDatabase, ref, update } from "firebase/database";
 
 const SettingsPage = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const db = getFirestore();
-  const auth_2 = getAuth();
 
   const navigation = useNavigation();
 
@@ -39,6 +39,16 @@ const SettingsPage = () => {
   };
 
   const handleSignOut = () => {
+    const rdb = getDatabase();
+    const entryRef = ref(rdb, "health_data/entry1");
+    update(entryRef, {
+      bpm: 0,
+      glucose: 0,
+      spo2: 0,
+    }).then(() => {
+      console.log("Data updated successfully!");
+    });
+
     auth
       .signOut()
       .then(() => {

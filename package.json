@@ -23,6 +23,7 @@
     "expo-device": "~6.0.2",
     "expo-document-picker": "^12.0.2",
     "expo-file-system": "^17.0.1",
+    "expo-intent-launcher": "~11.0.1",
     "expo-linear-gradient": "^13.0.2",
     "expo-sharing": "^12.0.1",
     "expo-status-bar": "~1.12.1",
@@ -31,9 +32,9 @@
     "react-native": "0.74.5",
     "react-native-ble-plx": "^3.2.1",
     "react-native-bluetooth-classic": "^1.73.0-rc.12",
-    "react-native-fs": "^2.20.0",
     "react-native-gifted-charts": "^1.4.44",
     "react-native-linear-gradient": "^2.8.3",
+    "react-native-markdown-display": "^7.0.2",
     "react-native-picker-select": "^9.3.1",
     "xlsx": "^0.18.5"
   },

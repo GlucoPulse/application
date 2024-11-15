@@ -221,6 +221,7 @@ const FrontPage = ({}) => {
               fontWeight: "bold",
               textAlign: "center",
               color: "white",
+              marginBottom: 10,
             }}
           >
             Need Help? Read the Documentation
@@ -363,7 +364,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginLeft: 25,
     marginRight: 25,
-    fontSize: 13,
+    fontSize: 14,
   },
   title: {
     fontSize: 16,
