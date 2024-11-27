@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet} from "react-native";
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import SettingsPage from "./SettingsPage";
@@ -9,7 +9,7 @@ import GlycemicLoadPage from "./GlycemicLoadPage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
-import { auth } from "../firebase";
+
 
 const Tab = createBottomTabNavigator();
 

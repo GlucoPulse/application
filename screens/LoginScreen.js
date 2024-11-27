@@ -1,6 +1,5 @@
 import {
   KeyboardAvoidingView,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
@@ -11,7 +10,6 @@ import {
 import React from "react";
 import { useState } from "react";
 import { auth } from "../firebase";
-import firebaseConfig from "../firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,

@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { auth } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
-import { getAuth, sendPasswordResetEmail } from "firebase/auth";
+import { sendPasswordResetEmail } from "firebase/auth";
 import {
   getFirestore,
   collection,
