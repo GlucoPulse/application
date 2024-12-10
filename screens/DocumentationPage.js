@@ -7,31 +7,6 @@ import {
   Image,
 } from "react-native";
 import React from "react";
-import Markdown from "react-native-markdown-display";
-
-const documentationMD = `
-
-## Table of Contents
-
-1. 
-2. 
-3. 
-
-## Introduction
-This is the introduction section of the essay. Here, we introduce the main topic and provide some background information.
-
-
-## Body
-
-### Section 1
-In this section, we discuss the first main point of the essay. This could include various subpoints and detailed explanations.
-
-### Section 2
-This section covers the second main point. Similar to Section 1, it includes detailed discussions and examples.
-
-## Conclusion
-The conclusion summarizes the main points discussed in the essay and provides final thoughts or recommendations.
-`;
 
 const DocumentationPage = () => {
   return (
@@ -49,9 +24,6 @@ const DocumentationPage = () => {
         style={styles.scrollViewDocs}
         contentContainerStyle={{ justifyContent: "center" }}
       >
-        <Markdown style={{ body: styles.markdownText }}>
-          {documentationMD}
-        </Markdown>
       </ScrollView>
     </View>
   );

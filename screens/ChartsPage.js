@@ -13,9 +13,7 @@ import {
   Image,
   StyleSheet,
   StatusBar,
-  Button,
   ScrollView,
-  Platform,
   TouchableOpacity,
 } from "react-native";
 import Picker from "react-native-picker-select";
@@ -23,7 +21,6 @@ import Entypo from "@expo/vector-icons/Entypo";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import * as DocumentPicker from "expo-document-picker";
-import * as XLSX from "xlsx";
 
 const ChartsPage = () => {
   const [valGLUserLineData, setValGLUserLineData] = useState([]);
@@ -207,124 +204,6 @@ const ChartsPage = () => {
 
     fetchData();
   }, [timeRange]);
-
-  const saveToXLSX = async () => {
-    const db = getFirestore();
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (user) {
-      // Fetch data from valGLUser collection
-      const valGLUserQuery = collection(db, "valGLUser");
-      const valGLUserSnapshot = await getDocs(valGLUserQuery);
-      const valGLUserData = valGLUserSnapshot.docs
-        .map((doc) => {
-          const { glycemicLoad, timestamp, userid } = doc.data();
-          const date = new Date(
-            timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000
-          );
-          return {
-            glycemicLoad,
-            timestamp: date,
-            userid,
-          };
-        })
-        .filter((item) => item.userid === user.uid);
-
-      // Sort valGLUser data by timestamp
-      valGLUserData.sort((a, b) => a.timestamp - b.timestamp);
-
-      // Prepare valGLUser data for the worksheet
-      const valGLUserHeader = ["Timestamp", "Glycemic Load"];
-      const valGLUserRows = valGLUserData.map((item) => [
-        item.timestamp.toLocaleString(),
-        item.glycemicLoad,
-      ]);
-
-      const valGLUserSheetData = [valGLUserHeader, ...valGLUserRows];
-      const valGLUserSheet = XLSX.utils.aoa_to_sheet(valGLUserSheetData);
-
-      // Fetch data from UserHealthData collection
-      const userHealthDataQuery = collection(db, "UserHealthData");
-      const userHealthDataSnapshot = await getDocs(userHealthDataQuery);
-      const userHealthData = userHealthDataSnapshot.docs
-        .map((doc) => {
-          const { HDtimestamp, userGLUCOSE, userSPO2, userUserID } = doc.data();
-          const date = new Date(
-            HDtimestamp.seconds * 1000 + HDtimestamp.nanoseconds / 1000000
-          );
-          return {
-            HDtimestamp: date,
-            userGLUCOSE,
-            userSPO2,
-            userUserID,
-          };
-        })
-        .filter((item) => item.userUserID === user.uid);
-
-      // Sort UserHealthData by HDtimestamp
-      userHealthData.sort((a, b) => a.HDtimestamp - b.HDtimestamp);
-
-      // Prepare UserHealthData for the worksheet
-      const userHealthDataHeader = ["Timestamp", "Glucose", "SPO2"];
-      const userHealthDataRows = userHealthData.map((item) => [
-        item.HDtimestamp.toLocaleString(),
-        item.userGLUCOSE,
-        item.userSPO2,
-      ]);
-
-      const userHealthDataSheetData = [
-        userHealthDataHeader,
-        ...userHealthDataRows,
-      ];
-      const userHealthDataSheet = XLSX.utils.aoa_to_sheet(
-        userHealthDataSheetData
-      );
-
-      // Log the data to ensure it's being fetched correctly
-      console.log("valGLUserData:", valGLUserData);
-      console.log("userHealthData:", userHealthData);
-
-      // Create a new workbook and append both sheets
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, valGLUserSheet, "Glycemic Load");
-      XLSX.utils.book_append_sheet(
-        workbook,
-        userHealthDataSheet,
-        "User Health Data"
-      );
-
-      // Write the workbook to a file
-      const wbout = XLSX.write(workbook, { type: "base64", bookType: "xlsx" });
-      const path = FileSystem.documentDirectory + "GlucoPulse User Data.xlsx";
-      await FileSystem.writeAsStringAsync(path, wbout, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
-      console.log("Excel file saved at:", path);
-
-      // Share the Excel file and let the user choose where to save
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(path);
-      } else {
-        console.log("Sharing is not available on this device");
-      }
-
-      // Open document picker and save to the chosen directory
-      const result = await DocumentPicker.getDocumentAsync({
-        copyToCacheDirectory: true,
-      });
-      if (result.type === "success") {
-        const newPath = result.uri;
-        await FileSystem.moveAsync({
-          from: path,
-          to: newPath,
-        });
-        console.log("Excel file moved to:", newPath);
-      }
-    } else {
-      console.log("No user is currently authenticated.");
-    }
-  };
 
   return (
     <SafeAreaView style={styles.container}>
