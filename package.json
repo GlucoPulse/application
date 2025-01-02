@@ -11,6 +11,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.3",
     "@react-native-firebase/app": "^21.4.0",
+    "@react-native-picker/picker": "^2.10.2",
     "@react-native-vector-icons/fontawesome": "^4.7.0-alpha.25",
     "@react-navigation/bottom-tabs": "^6.6.1",
     "@react-navigation/native": "^6.1.18",
