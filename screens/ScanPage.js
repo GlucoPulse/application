@@ -5,7 +5,6 @@ import {
   View,
   Image,
   TouchableOpacity,
-  Button,
   ToastAndroid,
   Alert,
 } from "react-native";
