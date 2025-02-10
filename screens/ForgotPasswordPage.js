@@ -34,7 +34,8 @@ const ForgotPasswordPage = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={"white"} barStyle={"dark-content"} />
       <View style={styles.header}>
-       
+      <Image source={require("../assets/icon.png")} style={styles.picLogo} />
+
       </View>
 
       <View style={styles.body}>

@@ -46,7 +46,7 @@ const AdminPage = () => {
 
         <TouchableOpacity
           style={styles.buttonHome}
-          onPress={() => navigation.navigate("HOME")}
+          onPress={() => navigation.navigate("Home")}
         >
           <Text style={styles.buttonTextHome}>Go Back Home</Text>
         </TouchableOpacity>

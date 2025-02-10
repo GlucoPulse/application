@@ -275,6 +275,7 @@ const FrontPage = ({}) => {
         <ScrollView contentContainerStyle={styles.container1}>
           {data.map((item, index) => (
             <View key={index} style={styles.box}>
+              <Image source={{ uri: item.image_url }} style={styles.image} />
               <Text style={styles.foodName}>{item.food}</Text>
              
             </View>

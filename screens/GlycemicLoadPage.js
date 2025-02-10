@@ -117,6 +117,7 @@ const GlycemicLoadPage = () => {
         </View>
 
         <View style={styles.leftColumn}>
+        <Image source={{ uri: item.image_url }} style={styles.image} />
           
 
           <Text style={styles.indexText}>
@@ -167,9 +168,11 @@ const GlycemicLoadPage = () => {
 
       <View style={styles.body}>
         <FlatList
+        
           data={filteredDishes}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
+          
         />
       </View>
     </KeyboardAvoidingView>

@@ -1,4 +1,4 @@
-import { StyleSheet} from "react-native";
+import { StyleSheet, Text,View } from "react-native";
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import SettingsPage from "./SettingsPage";
@@ -8,8 +8,7 @@ import ScanPage from "./ScanPage";
 import GlycemicLoadPage from "./GlycemicLoadPage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
-
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 const Tab = createBottomTabNavigator();
 
@@ -45,6 +44,19 @@ const HomeScreen = ({ navigation, route }) => {
               color={focused ? "#32a1d3" : "#ffffff"}
             />
           ),
+          tabBarLabel: ({ focused, color }) => (
+            <Text
+              style={{
+                color: focused ? "#32a1d3" : "#ffffff",
+                textAlign: "center",
+                flexWrap: "wrap",
+                fontSize: 11,
+                marginTop: 3,
+              }}
+            >
+              HOME
+            </Text>
+          ),
         }}
       />
       <Tab.Screen
@@ -57,7 +69,20 @@ const HomeScreen = ({ navigation, route }) => {
               size={28}
               style={styles.iconsTab}
               color={focused ? "#32a1d3" : "#ffffff"}
+              marginBottom={10}
             />
+          ),
+          tabBarLabel: ({ focused, color }) => (
+            <Text
+              style={{
+                color: focused ? "#32a1d3" : "#ffffff",
+                textAlign: "center",
+                flexWrap: "wrap",
+                fontSize: 10,
+              }}
+            >
+              GLYCEMIC LOAD
+            </Text>
           ),
         }}
       />
@@ -66,13 +91,25 @@ const HomeScreen = ({ navigation, route }) => {
         component={ScanPage}
         options={{
           tabBarIcon: ({ focused }) => (
-            <MaterialCommunityIcons
-              name="fingerprint"
-              size={28}
-              style={styles.iconCenter}
-              color={focused ? "#2244af" : "#ffffff"}
-            />
-          ), //@RUEL PA HELP SA COLORS HUEHUEHUHEU
+              <MaterialCommunityIcons
+                name="fingerprint"
+                size={28}
+                color={focused ? "#32a1d3" : "#ffffff"}
+              />
+          ),
+          tabBarLabel: ({ focused, color }) => (
+            <Text
+              style={{
+                color: focused ? "#32a1d3" : "#ffffff",
+                textAlign: "center",
+                flexWrap: "wrap",
+                fontSize: 11,
+                marginTop: 3,
+              }}
+            >
+              SCAN
+            </Text>
+          ),
         }}
       />
       <Tab.Screen
@@ -86,6 +123,19 @@ const HomeScreen = ({ navigation, route }) => {
               style={styles.iconsTab}
               color={focused ? "#32a1d3" : "#ffffff"}
             />
+          ),
+          tabBarLabel: ({ focused, color }) => (
+            <Text
+              style={{
+                color: focused ? "#32a1d3" : "#ffffff",
+                textAlign: "center",
+                flexWrap: "wrap",
+                fontSize: 11,
+                marginTop: 3,
+              }}
+            >
+              HISTORY
+            </Text>
           ),
         }}
       />
@@ -101,6 +151,19 @@ const HomeScreen = ({ navigation, route }) => {
               color={focused ? "#32a1d3" : "#ffffff"}
             />
           ),
+          tabBarLabel: ({ focused, color }) => (
+            <Text
+              style={{
+                color: focused ? "#32a1d3" : "#ffffff",
+                textAlign: "center",
+                flexWrap: "wrap",
+                fontSize: 11,
+                marginTop: 3,
+              }}
+            >
+              SETTINGS
+            </Text>
+          ),
         }}
       />
     </Tab.Navigator>
@@ -115,13 +178,13 @@ const styles = StyleSheet.create({
   iconCenter: {
     top: -15,
     height: 60,
-    borderRadius: 25,
+    borderRadius: 40,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#32a1d3",
-    paddingLeft: 15,
-    paddingRight: 15,
-    paddingTop: 15,
+    paddingLeft: 30,
+    paddingRight: 35,
+    paddingTop: 35,
   },
 });
 

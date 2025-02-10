@@ -59,7 +59,8 @@ const LoginScreen = () => {
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <StatusBar backgroundColor={"white"} barStyle={"dark-content"} />
       <View style={styles.header}>
-       
+      <Image source={require("../assets/icon.png")} style={styles.picLogo} />
+
       </View>
 
       <View style={styles.body}>
