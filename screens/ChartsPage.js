@@ -18,6 +18,7 @@ import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import * as DocumentPicker from "expo-document-picker";
 import XLSX from "xlsx";
+import { LineChart } from "react-native-gifted-charts";
 
 const ChartsPage = () => {
   const [valGLUserLineData, setValGLUserLineData] = useState([]);
@@ -370,6 +371,93 @@ const ChartsPage = () => {
           </View>
           <Text style={[styles.label]}> Glycemic Load History Chart</Text>
           
+          <LineChart
+            data={valGLUserLineData}
+            initialSpacing={30}
+            spacing={65}
+            textColor1="black"
+            textShiftY={-8}
+            textShiftX={-10}
+            textFontSize={13}
+            width={300}
+            //hideYAxisText
+            showTextOnFocus
+            showStripOnFocus
+            focusedDataPointColor={"#32a1d3"}
+            dataPointsColor="#d71c22"
+            focusEnabled
+            showVerticalLines
+            verticalLinesColor="#ccc"
+            color="#2244af"
+            focusedCustomDataPoint={(dataPoint) => (
+              <View style={styles.focusedDataPoint}>
+                <Text style={styles.focusedDataPointText}>
+                  {dataPoint.value} - {dataPoint.label}
+                </Text>
+              </View>
+            )}
+          />
+
+          <Text style={styles.labelB}>Glucose Level History Chart</Text>
+
+          <LineChart
+            data={userGLUCOSELineData}
+            initialSpacing={30}
+            spacing={65}
+            textColor1="black"
+            textShiftY={-8}
+            textShiftX={-10}
+            textFontSize={13}
+            width={300}
+            //hideYAxisText
+            showTextOnFocus
+            showStripOnFocus
+            focusedDataPointColor={"#32a1d3"}
+            dataPointsColor="#d71c22"
+            focusEnabled
+            showVerticalLines
+            verticalLinesColor="#ccc"
+            color="#2244af"
+            focusedCustomDataPoint={(dataPoint) => (
+              <View style={styles.focusedDataPoint}>
+                <Text style={styles.focusedDataPointText}>
+                  {dataPoint.value} - {dataPoint.label}
+                </Text>
+              </View>
+            )}
+          />
+
+          <Text style={styles.labelB}>
+            Oxygen Saturation Level History Chart
+          </Text>
+
+          <LineChart
+            data={userSPO2LineData}
+            initialSpacing={30}
+            spacing={65}
+            textColor1="black"
+            textShiftY={-8}
+            textShiftX={-10}
+            textFontSize={13}
+            width={300}
+            //hideYAxisText
+            showTextOnFocus
+            showStripOnFocus
+            focusedDataPointColor={"#32a1d3"}
+            dataPointsColor="#d71c22"
+            focusEnabled
+            showVerticalLines
+            verticalLinesColor="#ccc"
+            color="#2244af"
+            focusedCustomDataPoint={(dataPoint) => (
+              <View style={styles.focusedDataPoint}>
+                <Text style={styles.focusedDataPointText}>
+                  {dataPoint.value} - {dataPoint.label}
+                </Text>
+              </View>
+            )}
+          />
+
         </ScrollView>
       </View>
     </SafeAreaView>

@@ -4,11 +4,9 @@
     "slug": "glucopulse",
     "version": "1.0.0",
     "orientation": "portrait",
-
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-     
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -20,13 +18,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package" : {
-        "package": "glucopulse.application",
-        "newArchEnabled": true
-      }
+      "package": "com.example.app"
     },
-    "web": {
-
-    }
+    "web": {}
   }
 }

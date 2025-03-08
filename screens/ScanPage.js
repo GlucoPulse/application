@@ -107,7 +107,13 @@ const ScanPage = () => {
 
       <View style={styles.header}>
 
-        <Text style={styles.welcomeText}>Settings</Text>
+        <Image
+          source={require("../assets/word-logo-whitevar.png")}
+          style={styles.topImage}
+        />
+        
+
+        <Text style={styles.welcomeText}>Scan</Text>
       </View>
 
       <View style={styles.buttonContainer}>

@@ -60,16 +60,15 @@ const HomeScreen = ({ navigation, route }) => {
         }}
       />
       <Tab.Screen
-        name="GLYCEMIC LOAD"
+        name="LOAD"
         component={GlycemicLoadPage}
         options={{
           tabBarIcon: ({ focused }) => (
             <MaterialCommunityIcons
-              name="food"
+              name="food-apple"
               size={28}
               style={styles.iconsTab}
               color={focused ? "#32a1d3" : "#ffffff"}
-              marginBottom={10}
             />
           ),
           tabBarLabel: ({ focused, color }) => (
@@ -78,10 +77,11 @@ const HomeScreen = ({ navigation, route }) => {
                 color: focused ? "#32a1d3" : "#ffffff",
                 textAlign: "center",
                 flexWrap: "wrap",
-                fontSize: 10,
+                fontSize: 11,
+                marginTop: 3,
               }}
             >
-              GLYCEMIC LOAD
+              LOAD
             </Text>
           ),
         }}
