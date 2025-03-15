@@ -134,6 +134,11 @@ const ChartsPage = () => {
               (item) => now - item.timestamp < 2592000000
             ); // <30 days
             break;
+          case "all":
+            filteredValGLUserData = valGLUserData;
+            filteredUserGLUCOSEData = userGLUCOSEData;
+            filteredUserSPO2Data = userSPO2Data;
+            break;
           default:
             filteredValGLUserData = valGLUserData;
             filteredUserGLUCOSEData = userGLUCOSEData;
@@ -148,16 +153,42 @@ const ChartsPage = () => {
         const formatData = (data, timeRange) => {
           return data.map((item) => {
             let label;
-            if (timeRange === "week" || timeRange === "month") {
+            if (timeRange === "week") {
               label = item.timestamp.toLocaleDateString([], {
                 month: "2-digit",
                 day: "2-digit",
               });
-            } else {
+            }
+            if (timeRange === "month") {
+              label = item.timestamp.toLocaleDateString([], {
+                month: "2-digit",
+                day: "2-digit",
+              });
+            }
+            if (timeRange === "all") {
+              label = item.timestamp.toLocaleDateString([], {
+                month: "2-digit",
+                day: "2-digit",
+                year: "2-digit"
+              });
+            }
+            if (timeRange === "day") {
               label = item.timestamp.toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               });
+            }
+            if (timeRange === "hour") {
+              label = item.timestamp.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+            }
+            else {
+              // label = item.timestamp.toLocaleDateString([], {
+              //   hour: "2-digit",
+              //   minute: "2-digit",
+              // });
             }
 
             return {
@@ -331,6 +362,7 @@ const ChartsPage = () => {
             { label: "Last Day", value: "day" },
             { label: "Last Week", value: "week" },
             { label: "Last Month", value: "month" },
+            { label: "All Time", value: "all" }
           ]}
           useNativeAndroidPickerStyle={false}
           style={{
@@ -370,93 +402,198 @@ const ChartsPage = () => {
             </TouchableOpacity>
           </View>
           <Text style={[styles.label]}> Glycemic Load History Chart</Text>
-          
-          <LineChart
-            data={valGLUserLineData}
-            initialSpacing={30}
-            spacing={65}
-            textColor1="black"
-            textShiftY={-8}
-            textShiftX={-10}
-            textFontSize={13}
-            width={300}
-            //hideYAxisText
-            showTextOnFocus
-            showStripOnFocus
-            focusedDataPointColor={"#32a1d3"}
-            dataPointsColor="#d71c22"
-            focusEnabled
-            showVerticalLines
-            verticalLinesColor="#ccc"
-            color="#2244af"
-            focusedCustomDataPoint={(dataPoint) => (
-              <View style={styles.focusedDataPoint}>
-                <Text style={styles.focusedDataPointText}>
-                  {dataPoint.value} - {dataPoint.label}
-                </Text>
-              </View>
-            )}
-          />
+
+            <LineChart
+              areaChart
+              data={valGLUserLineData}
+              curved
+              startFillColor="rgb(46, 217, 255)"
+              startOpacity={0.8}
+              endFillColor="rgb(203, 241, 250)"
+              endOpacity={0.3}
+              initialSpacing={30}
+              endSpacing={20}
+              spacing={65} // Decrease spacing between points to fit all data
+              textColor1="black"
+              textFontSize={0}
+              showStripOnFocus
+              focusedDataPointColor={"#32a1d3"}
+              dataPointsColor="#d71c22"
+              focusEnabled
+              showVerticalLines
+              verticalLinesColor="#ccc"
+              color="#2244af"
+              adjustToWidth // Forces chart to fit all data points
+              scrollable={false} // Disable scrolling
+              showScrollIndicator={false} // Remove the scrollbar
+              yAxisOffset={-25}
+              hideYAxisText
+              focusedCustomDataPoint={(dataPoint) => (
+                <>
+                  {/* Pointer Label */}
+                  <View
+                    style={{
+                      position: 'absolute',
+                      bottom: 20, // Move it right above the point
+                      left: '50%', // Center horizontally
+                      transform: [{ translateX: -30 }], // Adjust to center the label
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                      backgroundColor: 'white',
+                      borderRadius: 15,
+                      elevation: 5,
+                    }}
+                  >
+                    <Text style={{ color: 'black', fontWeight: 'bold', textAlign: 'center' }}>
+                      {dataPoint.value}
+                      {"\n"}
+                      {dataPoint.label}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor: '#d71c22',
+                      borderWidth: 2,
+                      borderColor: 'white',
+                    }}
+                  />
+                </>
+              )}
+            />
+
 
           <Text style={styles.labelB}>Glucose Level History Chart</Text>
 
           <LineChart
-            data={userGLUCOSELineData}
-            initialSpacing={30}
-            spacing={65}
-            textColor1="black"
-            textShiftY={-8}
-            textShiftX={-10}
-            textFontSize={13}
-            width={300}
-            //hideYAxisText
-            showTextOnFocus
-            showStripOnFocus
-            focusedDataPointColor={"#32a1d3"}
-            dataPointsColor="#d71c22"
-            focusEnabled
-            showVerticalLines
-            verticalLinesColor="#ccc"
-            color="#2244af"
-            focusedCustomDataPoint={(dataPoint) => (
-              <View style={styles.focusedDataPoint}>
-                <Text style={styles.focusedDataPointText}>
-                  {dataPoint.value} - {dataPoint.label}
-                </Text>
-              </View>
-            )}
-          />
+              areaChart
+              data={userGLUCOSELineData}
+              curved
+              startFillColor="rgb(46, 217, 255)"
+              startOpacity={0.8}
+              endFillColor="rgb(203, 241, 250)"
+              endOpacity={0.3}
+              initialSpacing={30}
+              endSpacing={20}
+              spacing={65} // Decrease spacing between points to fit all data
+              textColor1="black"
+              textFontSize={0}
+              showStripOnFocus
+              focusedDataPointColor={"#32a1d3"}
+              dataPointsColor="#d71c22"
+              focusEnabled
+              showVerticalLines
+              verticalLinesColor="#ccc"
+              color="#2244af"
+              adjustToWidth // Forces chart to fit all data points
+              scrollable={false} // Disable scrolling
+              showScrollIndicator={false} // Remove the scrollbar
+              yAxisOffset={-25}
+              hideYAxisText
+              focusedCustomDataPoint={(dataPoint) => (
+                <>
+                  {/* Pointer Label */}
+                  <View
+                    style={{
+                      position: 'absolute',
+                      bottom: 20, // Move it right above the point
+                      left: '50%', // Center horizontally
+                      transform: [{ translateX: -30 }], // Adjust to center the label
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                      backgroundColor: 'white',
+                      borderRadius: 15,
+                      elevation: 5,
+                    }}
+                  >
+                    <Text style={{ color: 'black', fontWeight: 'bold', textAlign: 'center' }}>
+                      {dataPoint.value}
+                      {"\n"}
+                      {dataPoint.label}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor: '#d71c22',
+                      borderWidth: 2,
+                      borderColor: 'white',
+                    }}
+                  />
+                </>
+              )}
+            />
+          
 
           <Text style={styles.labelB}>
             Oxygen Saturation Level History Chart
           </Text>
 
           <LineChart
-            data={userSPO2LineData}
-            initialSpacing={30}
-            spacing={65}
-            textColor1="black"
-            textShiftY={-8}
-            textShiftX={-10}
-            textFontSize={13}
-            width={300}
-            //hideYAxisText
-            showTextOnFocus
-            showStripOnFocus
-            focusedDataPointColor={"#32a1d3"}
-            dataPointsColor="#d71c22"
-            focusEnabled
-            showVerticalLines
-            verticalLinesColor="#ccc"
-            color="#2244af"
-            focusedCustomDataPoint={(dataPoint) => (
-              <View style={styles.focusedDataPoint}>
-                <Text style={styles.focusedDataPointText}>
-                  {dataPoint.value} - {dataPoint.label}
-                </Text>
-              </View>
-            )}
-          />
+              areaChart
+              data={userSPO2LineData}
+              curved
+              startFillColor="rgb(46, 217, 255)"
+              startOpacity={0.8}
+              endFillColor="rgb(203, 241, 250)"
+              endOpacity={0.3}
+              initialSpacing={30}
+              endSpacing={20}
+              spacing={65} // Decrease spacing between points to fit all data
+              textColor1="black"
+              textFontSize={0}
+              showStripOnFocus
+              focusedDataPointColor={"#32a1d3"}
+              dataPointsColor="#d71c22"
+              focusEnabled
+              showVerticalLines
+              verticalLinesColor="#ccc"
+              color="#2244af"
+              adjustToWidth // Forces chart to fit all data points
+              scrollable={false} // Disable scrolling
+              showScrollIndicator={false} // Remove the scrollbar
+              yAxisOffset={-25}
+              hideYAxisText
+              focusedCustomDataPoint={(dataPoint) => (
+                <>
+                  {/* Pointer Label */}
+                  <View
+                    style={{
+                      position: 'absolute',
+                      bottom: 20, // Move it right above the point
+                      left: '50%', // Center horizontally
+                      transform: [{ translateX: -30 }], // Adjust to center the label
+                      paddingHorizontal: 10,
+                      paddingVertical: 5,
+                      backgroundColor: 'white',
+                      borderRadius: 15,
+                      elevation: 5,
+                    }}
+                  >
+                    <Text style={{ color: 'black', fontWeight: 'bold', textAlign: 'center' }}>
+                      {dataPoint.value}
+                      {"\n"}
+                      {dataPoint.label}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor: '#d71c22',
+                      borderWidth: 2,
+                      borderColor: 'white',
+                    }}
+                  />
+                </>
+              )}
+            />
+         
 
         </ScrollView>
       </View>
