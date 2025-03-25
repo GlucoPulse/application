@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "glucopulse",
-    "slug": "glucopulse",
-    "version": "1.0.0",
+    "name": "GlucoPulse",
+    "slug": "GlucoPulse",
+    "version": "0.2.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
@@ -18,7 +18,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.example.app"
+      "package": "dlar.glucopulse.app"
     },
     "web": {}
   }

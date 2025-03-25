@@ -12,8 +12,7 @@ import {
 	ScrollView,
 	TouchableOpacity,
 } from "react-native";
-import Picker from "react-native-picker-select";
-import Entypo from "@expo/vector-icons/Entypo";
+import { Picker } from "@react-native-picker/picker";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import * as DocumentPicker from "expo-document-picker";
@@ -31,7 +30,7 @@ const ChartsPage = () => {
 			const db = getFirestore();
 			const auth = getAuth();
 			const user = auth.currentUser;
-			
+
 			if (user) {
 				// Fetch data from valGLUser collection
 				const valGLUserQuery = collection(db, "valGLUser");
@@ -355,6 +354,7 @@ const ChartsPage = () => {
 			</View>
 
 			<View style={styles.body}>
+				{/*}
 				<Picker
 					onValueChange={(value) => setTimeRange(value)}
 					items={[
@@ -386,6 +386,21 @@ const ChartsPage = () => {
 						backgroundColor: "#afd3e5",
 					}}
 				/>
+				{*/}
+				<View style={styles.pickerContainer}>
+					<Picker
+						selectedValue={null}
+						onValueChange={(value) => setTimeRange(value)}
+						style={styles.picker}
+					>
+						<Picker.Item label="Sort data" value={null} />
+						<Picker.Item label="Last Hour" value="hour" />
+						<Picker.Item label="Last Day" value="day" />
+						<Picker.Item label="Last Week" value="week" />
+						<Picker.Item label="Last Month" value="month" />
+						<Picker.Item label="All Time" value="all" />
+					</Picker>
+				</View>
 			</View>
 
 			<View style={styles.body2}>
@@ -403,7 +418,7 @@ const ChartsPage = () => {
 					</View>
 					<Text style={[styles.label]}> Glycemic Load History Chart</Text>
 
-			
+
 					{valGLUserLineData.length === 0 ? (
 						<Text style={styles.noDataText}>No data available</Text>
 					) : (
@@ -515,7 +530,7 @@ const ChartsPage = () => {
 										}}
 									>
 										<Text style={{ color: 'black', fontWeight: 'bold', textAlign: 'center' }}>
-											{dataPoint.value -10}
+											{dataPoint.value - 10}
 											{"\n"}
 											{dataPoint.label}
 										</Text>
@@ -584,7 +599,7 @@ const ChartsPage = () => {
 										}}
 									>
 										<Text style={{ color: 'black', fontWeight: 'bold', textAlign: 'center' }}>
-											{dataPoint.value -10 }
+											{dataPoint.value - 10}
 											{"\n"}
 											{dataPoint.label}
 										</Text>
@@ -713,6 +728,21 @@ const styles = StyleSheet.create({
 		marginTop: 5,
 		fontSize: 16,
 		color: 'gray'
+	},
+	picker: {
+		backgroundColor: "#afd3e5",
+		borderRadius: 10,
+		color: 'black',
+	},
+	pickerContainer: {
+		borderRadius: 10,
+		overflow: 'hidden',
+		borderWidth: 1,
+		borderColor: '#afd3e5',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.8,
+		shadowRadius: 2,
+		elevation: 5,
 	}
 });
 
