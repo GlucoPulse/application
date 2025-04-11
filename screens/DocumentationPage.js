@@ -38,7 +38,7 @@ const DocumentationPage = () => {
 
 				<Text style={styles.subsubheading}>How To Use the Device</Text>
 				<Text style={styles.paragraph}>
-					On the right side of the case, the toggle switch can be found. This can turn the device on or off.
+					On the side of the case, the toggle switch can be found. This can turn the device on or off.
 				</Text>
 				<Text style={styles.paragraph}>
 					Once the device has been turned on, it functions in offline mode by default, allowing users to use the device without Wi-Fi connectivity. A red light will turn on to signify that the input from a user's fingertip can now be placed on top of the cover of the sensor. A prompt will be displayed indicating that the glucose is being calculated. The result will be displayed on the OLED screen once the calculation is done.
@@ -46,7 +46,7 @@ const DocumentationPage = () => {
 
 				<Text style={styles.subsubheading}>Using the Device with Wi-Fi</Text>
 				<Text style={styles.paragraph}>
-					To connect the device to the network, [button location] must be pressed once, which turns on the Wi-Fi module on the microcontroller.
+					To connect the device to the network, the button must be pressed once, which turns on the Wi-Fi module on the microcontroller.
 				</Text>
 				<Text style={styles.paragraph}>
 					On the GlucoPulse Android application, once logged in, the scan tab has a button entitled "Connect to GlucoPulse Device". Clicking this button will prompt the smartphone to open its Wi-Fi settings, allowing the GlucoPulse device to connect to the internet.
