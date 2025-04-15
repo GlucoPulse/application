@@ -28,30 +28,61 @@ const ScanPage = () => {
 	const firestore = getFirestore();
 	const auth = getAuth(); // Initialize Firebase Auth
 	const [latestEntry, setLatestEntry] = useState(null);
+	/*
+		useEffect(() => {
+			const fetchLatestEntry = async () => {
+				const countRef = ref(database, "health_data/count");
+				onValue(countRef, (snapshot) => {
+					const count = snapshot.val();
+					const latestEntryRef = query(
+						ref(database, "health_data"),
+						orderByKey(),
+						limitToLast(1)
+					);
+					onValue(latestEntryRef, (snapshot) => {
+						snapshot.forEach((childSnapshot) => {
+							const key = childSnapshot.key;
+							if (key.startsWith(`entry${count}`)) {
+								const data = childSnapshot.val();
+								const filteredData = {
+									glucose: data.glucose,
+									spo2: data.spo2,
+								};
+								setLatestEntry(filteredData);
+							}
+						});
+					});
+				});
+			};
+	
+			fetchLatestEntry();
+		}, []);
+	*/
 
 	useEffect(() => {
 		const fetchLatestEntry = async () => {
 			const countRef = ref(database, "health_data/count");
 			onValue(countRef, (snapshot) => {
 				const count = snapshot.val();
-				const latestEntryRef = query(
-					ref(database, "health_data"),
-					orderByKey(),
-					limitToLast(1)
-				);
+				if (!count) {
+					console.warn("No count found in database.");
+					return;
+				}
+
+
+				const latestEntryRef = ref(database, `health_data/entry${count}`);
+
 				onValue(latestEntryRef, (snapshot) => {
-					snapshot.forEach((childSnapshot) => {
-						const key = childSnapshot.key;
-						if (key.startsWith(`entry${count}`)) {
-							const data = childSnapshot.val();
-							const filteredData = {
-								bpm: data.bpm,
-								glucose: data.glucose,
-								spo2: data.spo2,
-							};
-							setLatestEntry(filteredData);
-						}
-					});
+					const data = snapshot.val();
+					if (data) {
+						const filteredData = {
+							glucose: data.glucose,
+							spo2: data.spo2,
+						};
+						setLatestEntry(filteredData);
+					} else {
+						console.warn(`No data found at entry${count}`);
+					}
 				});
 			});
 		};
@@ -63,13 +94,11 @@ const ScanPage = () => {
 		const user = auth.currentUser;
 		if (user) {
 			console.log("Saving the following data to Firestore:");
-			console.log("userBPM:", data.bpm);
 			console.log("userGLUCOSE:", data.glucose);
 			console.log("userSPO2:", data.spo2);
 			console.log("userUserID:", user.uid);
 
 			await addDoc(collection(firestore, "UserHealthData"), {
-				userBPM: data.bpm,
 				userGLUCOSE: data.glucose,
 				userSPO2: data.spo2,
 				userUserID: user.uid,
