@@ -14,9 +14,6 @@ import { useEffect, useState } from "react";
 import {
 	getDatabase,
 	ref,
-	query,
-	orderByKey,
-	limitToLast,
 	onValue,
 } from "firebase/database";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
@@ -34,70 +31,27 @@ const ScanPage = () => {
 			const countRef = ref(database, "health_data/count");
 			onValue(countRef, (snapshot) => {
 				const count = snapshot.val();
-				const latestEntryRef = query(
-					ref(database, "health_data"),
-					orderByKey(),
-					limitToLast(1)
-				);
-				onValue(latestEntryRef, (snapshot) => {
-					snapshot.forEach((childSnapshot) => {
-						const key = childSnapshot.key;
-						if (key.startsWith(`entry${count}`)) {
-							const data = childSnapshot.val();
-							const filteredData = {
-								bpm: data.bpm,
-								glucose: data.glucose,
-								spo2: data.spo2,
-							};
-							setLatestEntry(filteredData);
-						}
-					});
-				});
-			});
-		};
-
-		fetchLatestEntry();
-	}, []);
-	*/
-	/*
-	useEffect(() => {
-		const fetchLatestEntry = async () => {
-			const countRef = ref(database, "health_data/count");
-			onValue(countRef, (snapshot) => {
-				const count = snapshot.val();
 				if (!count) {
 					console.warn("No count found in database.");
 					return;
 				}
-
 				const latestEntryRef = ref(database, `health_data/entry${count}`);
-
 				onValue(latestEntryRef, (snapshot) => {
 					const data = snapshot.val();
 					if (data) {
-						const now = Date.now();
-						const FIVE_MINUTES = 5 * 60 * 1000;
-
-						if (data.timestamp && now - data.timestamp <= FIVE_MINUTES) {
-							const filteredData = {
-								glucose: data.glucose,
-								spo2: data.spo2,
-							};
-							setLatestEntry(filteredData);
-						} else {
-							console.warn("Latest entry is older than 5 minutes or missing timestamp.");
-							setLatestEntry(null); // optional: clear stale data
-						}
+						const filteredData = {
+							glucose: data.glucose,
+							spo2: data.spo2,
+						};
+						setLatestEntry(filteredData);
 					} else {
 						console.warn(`No data found at entry${count}`);
 					}
 				});
 			});
-		};
-
-		fetchLatestEntry();
+		}; fetchLatestEntry();
 	}, []);
-*/
+
 	const saveToFirestore = async (data) => {
 		const user = auth.currentUser;
 		if (user) {
@@ -112,7 +66,6 @@ const ScanPage = () => {
 			console.log("userUserID:", user.uid);
 
 			await addDoc(collection(firestore, "UserHealthData"), {
-				userBPM: data.bpm,
 				userGLUCOSE: data.glucose,
 				userSPO2: data.spo2,
 				userUserID: user.uid,
@@ -129,7 +82,7 @@ const ScanPage = () => {
 	const showAlert = () => {
 		Alert.alert(
 			"Instructions",
-			"This will open the Wi-Fi settings which allows GlucoPulse to connect to internet. \n\nClick GlucoPulse_AP to change the Wi-Fi credentials of the GlucoPulse device.\n\nKeep in mind that you should revert back to your original Wi-Fi connection of your phone to garner data.",
+			"This will open the Wi-Fi settings which allows GlucoPulse to connect to internet. \n\nClick GlucoPulse_AP to change the Wi-Fi credentials of the GlucoPulse device.\n\nKeep in mind that you should revert back to your original Wi-Fi connection of your phone to garner data.\n\nTo verify whether the device is connected to the internet, you may check the GlucoPulse device screen.",
 			[
 				{
 					text: "OK",
@@ -172,25 +125,7 @@ const ScanPage = () => {
 					</Text>
 				</TouchableOpacity>
 			</View>
-			{/*}{*/}
 			{latestEntry && (
-				<View style={styles.dataContainer}>
-					<View style={styles.dataBox}>
-						<Text style={styles.dataLabel}>Glucose</Text>
-						<Text style={styles.dataValue}>
-							{(latestEntry.glucose).toFixed(2)} mg/dL
-						</Text>
-					</View>
-					<View style={styles.dataBox}>
-						<Text style={styles.dataLabel}>SPO2</Text>
-						<Text style={styles.dataValue}>
-							{(latestEntry.spo2).toFixed(2)}%
-						</Text>
-					</View>
-				</View>
-			)}
-				{/*}
-			{latestEntry ? (
 				<View style={styles.dataContainer}>
 					<View style={styles.dataBox}>
 						<Text style={styles.dataLabel}>Glucose</Text>
@@ -205,36 +140,7 @@ const ScanPage = () => {
 						</Text>
 					</View>
 				</View>
-			) : (
-				<View style={styles.dataBoxNoData}>
-					<Text style={styles.dataValue}>No recent data found</Text>
-				</View>
 			)}
-
-			
-			{latestEntries.length > 0 ? (
-				latestEntries.map((entry, index) => (
-					<View key={index} style={styles.dataContainer}>
-						<View style={styles.dataBox}>
-							<Text style={styles.dataLabel}>Glucose</Text>
-							<Text style={styles.dataValue}>
-								{entry.glucose.toFixed(2)} mg/dL
-							</Text>
-						</View>
-						<View style={styles.dataBox}>
-							<Text style={styles.dataLabel}>SPO2</Text>
-							<Text style={styles.dataValue}>
-								{entry.spo2.toFixed(2)}%
-							</Text>
-						</View>
-					</View>
-				))
-			) : (
-				<View style={styles.dataBoxNoData}>
-					<Text style={styles.dataValue}>No recent data found</Text>
-				</View>
-			)}
-				{*/}
 
 			<View style={styles.buttonContainer}>
 				<TouchableOpacity

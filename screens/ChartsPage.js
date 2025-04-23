@@ -1,7 +1,6 @@
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useEffect, useState, useCallback } from "react";
-
 import {
 	View,
 	Text,
@@ -34,7 +33,6 @@ const ChartsPage = () => {
 			const user = auth.currentUser;
 
 			if (user) {
-				// Fetch data from valGLUser collection
 				const valGLUserQuery = collection(db, "valGLUser");
 				const valGLUserSnapshot = await getDocs(valGLUserQuery);
 
@@ -241,7 +239,6 @@ const ChartsPage = () => {
 		const user = auth.currentUser;
 
 		if (user) {
-			// Fetch data from valGLUser collection
 			const valGLUserQuery = collection(db, "valGLUser");
 			const valGLUserSnapshot = await getDocs(valGLUserQuery);
 			const valGLUserData = valGLUserSnapshot.docs
@@ -258,16 +255,13 @@ const ChartsPage = () => {
 				})
 				.filter((item) => item.userid === user.uid); // Filter by user ID
 
-			// Sort valGLUser data by timestamp
 			valGLUserData.sort((a, b) => a.timestamp - b.timestamp);
 
-			// Prepare valGLUser data for the worksheet
 			const valGLUserSheetData = valGLUserData.map((item) => ({
 				timestamp: item.timestamp.toLocaleString(),
 				glycemicLoad: item.glycemicLoad,
 			}));
 
-			// Fetch data from UserHealthData collection
 			const userHealthDataQuery = collection(db, "UserHealthData");
 			const userHealthDataSnapshot = await getDocs(userHealthDataQuery);
 			const userHealthData = userHealthDataSnapshot.docs
@@ -285,21 +279,16 @@ const ChartsPage = () => {
 				})
 				.filter((item) => item.userUserID === user.uid); // Filter by user ID
 
-			// Sort UserHealthData by HDtimestamp
 			userHealthData.sort((a, b) => a.HDtimestamp - b.HDtimestamp);
-
-			// Prepare UserHealthData for the worksheet
 			const userHealthDataSheetData = userHealthData.map((item) => ({
 				timestamp: item.HDtimestamp.toLocaleString(),
 				userGLUCOSE: item.userGLUCOSE,
 				userSPO2: item.userSPO2,
 			}));
 
-			// Log the data to ensure it's being fetched correctly
 			console.log("valGLUserData:", valGLUserData);
 			console.log("userHealthData:", userHealthData);
 
-			// Create a new workbook and append both sheets
 			const workbook = XLSX.utils.book_new();
 			const valGLUserSheet = XLSX.utils.json_to_sheet(valGLUserSheetData);
 			const userHealthDataSheet = XLSX.utils.json_to_sheet(
@@ -313,7 +302,6 @@ const ChartsPage = () => {
 				"User Health Data"
 			);
 
-			// Write the workbook to a file
 			const wbout = XLSX.write(workbook, { type: "base64", bookType: "xlsx" });
 			const path = FileSystem.documentDirectory + "GlucoPulse_User_Data.xlsx";
 			await FileSystem.writeAsStringAsync(path, wbout, {
@@ -322,14 +310,12 @@ const ChartsPage = () => {
 
 			console.log("Excel file saved at:", path);
 
-			// Share the Excel file and let the user choose where to save
 			if (await Sharing.isAvailableAsync()) {
 				await Sharing.shareAsync(path);
 			} else {
 				console.log("Sharing is not available on this device");
 			}
 
-			// Open document picker and save to the chosen directory
 			const result = await DocumentPicker.getDocumentAsync({
 				copyToCacheDirectory: true,
 			});
@@ -342,17 +328,8 @@ const ChartsPage = () => {
 			console.log("No user is currently authenticated.");
 		}
 	};
-	/*
-		const onRefresh = useCallback(() => {
-			setRefreshing(true);
-	
-			setTimeout(() => {
-				setRefreshing(false);
-			}, 2000);
-		}, []);
-	*/
 
-	const fetchData = async () => {
+	const fetchData = async (selectedRange = timeRange) => {
 		setRefreshing(true);
 
 		const db = getFirestore();
@@ -360,23 +337,152 @@ const ChartsPage = () => {
 		const user = auth.currentUser;
 
 		if (user) {
-			// (same code as before)
-			// Fetch and filter valGLUser, userGLUCOSE, and userSPO2...
-			// Format and set line chart data...
+			try {
+				const valGLUserQuery = collection(db, "valGLUser");
+				const valGLUserSnapshot = await getDocs(valGLUserQuery);
+
+				const valGLUserData = valGLUserSnapshot.docs
+					.map((doc) => {
+						const { glycemicLoad, timestamp, userid } = doc.data();
+						const date = new Date(
+							timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000
+						);
+						return {
+							glycemicLoad,
+							timestamp: date,
+							userid,
+						};
+					})
+					.filter((item) => item.userid === user.uid);
+
+				const userHealthDataQuery = collection(db, "UserHealthData");
+				const userHealthDataSnapshot = await getDocs(userHealthDataQuery);
+
+				const userGLUCOSEData = userHealthDataSnapshot.docs
+					.map((doc) => {
+						const { userGLUCOSE, HDtimestamp, userUserID } = doc.data();
+						const date = new Date(
+							HDtimestamp.seconds * 1000 + HDtimestamp.nanoseconds / 1000000
+						);
+						return {
+							userGLUCOSE,
+							timestamp: date,
+							userUserID,
+						};
+					})
+					.filter((item) => item.userUserID === user.uid);
+
+				const userSPO2Data = userHealthDataSnapshot.docs
+					.map((doc) => {
+						const { userSPO2, HDtimestamp, userUserID } = doc.data();
+						const date = new Date(
+							HDtimestamp.seconds * 1000 + HDtimestamp.nanoseconds / 1000000
+						);
+						return {
+							userSPO2,
+							timestamp: date,
+							userUserID,
+						};
+					})
+					.filter((item) => item.userUserID === user.uid);
+
+				const now = new Date();
+				const rangeMs = {
+					hour: 3600000,
+					day: 86400000,
+					week: 604800000,
+					month: 2592000000,
+				};
+
+				const filterByRange = (data, rangeKey) =>
+					rangeKey === "all"
+						? data
+						: data.filter((item) => now - item.timestamp < rangeMs[rangeKey]);
+
+				const filteredValGLUserData = filterByRange(valGLUserData, selectedRange);
+				const filteredUserGLUCOSEData = filterByRange(userGLUCOSEData, selectedRange);
+				const filteredUserSPO2Data = filterByRange(userSPO2Data, selectedRange);
+
+				filteredValGLUserData.sort((a, b) => a.timestamp - b.timestamp);
+				filteredUserGLUCOSEData.sort((a, b) => a.timestamp - b.timestamp);
+				filteredUserSPO2Data.sort((a, b) => a.timestamp - b.timestamp);
+
+				const formatData = (data, timeRange) => {
+					return data.map((item) => {
+						let label = "";
+
+						if (["week", "month"].includes(timeRange)) {
+							label = item.timestamp.toLocaleDateString([], {
+								month: "2-digit",
+								day: "2-digit",
+							});
+						} else if (timeRange === "all") {
+							label = item.timestamp.toLocaleDateString([], {
+								month: "2-digit",
+								day: "2-digit",
+								year: "2-digit",
+							});
+						} else if (["day", "hour"].includes(timeRange)) {
+							label = item.timestamp.toLocaleTimeString([], {
+								hour: "2-digit",
+								minute: "2-digit",
+							});
+						}
+
+						return {
+							value: item.value,
+							dataPointText: item.value.toString(),
+							label: label,
+						};
+					});
+				};
+
+				const formattedValGLUserData = formatData(
+					filteredValGLUserData.map((item) => ({
+						value: item.glycemicLoad,
+						timestamp: item.timestamp,
+					})),
+					selectedRange
+				);
+
+				const formattedUserGLUCOSEData = formatData(
+					filteredUserGLUCOSEData.map((item) => ({
+						value: item.userGLUCOSE,
+						timestamp: item.timestamp,
+					})),
+					selectedRange
+				);
+
+				const formattedUserSPO2Data = formatData(
+					filteredUserSPO2Data.map((item) => ({
+						value: item.userSPO2,
+						timestamp: item.timestamp,
+					})),
+					selectedRange
+				);
+
+				setValGLUserLineData(formattedValGLUserData);
+				setUserGLUCOSELineData(formattedUserGLUCOSEData);
+				setUserSPO2LineData(formattedUserSPO2Data);
+
+			} catch (error) {
+				console.error("Error refreshing data:", error);
+			} finally {
+				setRefreshing(false);
+			}
 		} else {
 			console.log("No user is currently authenticated.");
+			setRefreshing(false);
 		}
-
-		setRefreshing(false);
 	};
 
-	useEffect(() => {
-		fetchData();
+	const onRefresh = useCallback(() => {
+		fetchData(timeRange);
 	}, [timeRange]);
 
-	const onRefresh = useCallback(() => {
-		fetchData();
-	}, []);
+	useEffect(() => {
+		fetchData(timeRange);
+	}, [timeRange]);
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -391,57 +497,6 @@ const ChartsPage = () => {
 			</View>
 
 			<View style={styles.body}>
-				{/*}
-				<Picker
-					onValueChange={(value) => setTimeRange(value)}
-					items={[
-						{ label: "Last Hour", value: "hour" },
-						{ label: "Last Day", value: "day" },
-						{ label: "Last Week", value: "week" },
-						{ label: "Last Month", value: "month" },
-						{ label: "All Time", value: "all" }
-					]}
-					useNativeAndroidPickerStyle={false}
-					style={{
-						inputAndroid: styles.inputAndroid,
-						placeholder: styles.placeholder,
-					}}
-					Icon={() => {
-						return (
-							<Entypo
-								name="triangle-down"
-								size={24}
-								color="gray"
-								marginTop={26}
-								styl={styles.iconDD}
-								marginRight={15}
-							/>
-						);
-					}}
-					placeholder={{ label: "Sort data", value: null }}
-					activeItemStyle={{
-						backgroundColor: "#afd3e5",
-					}}
-				/>
-				{*/}
-
-				{/*}
-				<View style={styles.pickerContainer}>
-					<Picker
-						selectedValue={null}
-						onValueChange={(value) => setTimeRange(value)}
-						style={styles.picker}
-					>
-						<Picker.Item label="Sort data" value={null} />
-						<Picker.Item label="Last Hour" value="hour" />
-						<Picker.Item label="Last Day" value="day" />
-						<Picker.Item label="Last Week" value="week" />
-						<Picker.Item label="Last Month" value="month" />
-						<Picker.Item label="All Time" value="all" />
-					</Picker>
-				</View>
-				{*/}
-
 				<View style={styles.pickerContainer}>
 					<Picker
 						selectedValue={timeRange}
