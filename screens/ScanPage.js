@@ -28,7 +28,7 @@ const ScanPage = () => {
 	const firestore = getFirestore();
 	const auth = getAuth(); // Initialize Firebase Auth
 	const [latestEntry, setLatestEntry] = useState(null);
-	// const [latestEntries, setLatestEntries] = useState([]);
+
 	useEffect(() => {
 		const fetchLatestEntry = async () => {
 			const countRef = ref(database, "health_data/count");
@@ -45,43 +45,13 @@ const ScanPage = () => {
 						if (key.startsWith(`entry${count}`)) {
 							const data = childSnapshot.val();
 							const filteredData = {
+								bpm: data.bpm,
 								glucose: data.glucose,
 								spo2: data.spo2,
 							};
 							setLatestEntry(filteredData);
 						}
 					});
-				});
-			});
-		};
-
-		fetchLatestEntry();
-	}, []);
-
-	/*
-	useEffect(() => {
-		const fetchLatestEntry = async () => {
-			const countRef = ref(database, "health_data/count");
-			onValue(countRef, (snapshot) => {
-				const count = snapshot.val();
-				if (!count) {
-					console.warn("No count found in database.");
-					return;
-				}
-
-				const latestEntryRef = ref(database, `health_data/entry${count}`);
-
-				onValue(latestEntryRef, (snapshot) => {
-					const data = snapshot.val();
-					if (data) {
-						const filteredData = {
-							glucose: data.glucose,
-							spo2: data.spo2,
-						};
-						setLatestEntry(filteredData);
-					} else {
-						console.warn(`No data found at entry${count}`);
-					}
 				});
 			});
 		};
@@ -136,13 +106,15 @@ const ScanPage = () => {
 			const roundedSpo2 = Number(data.spo2.toFixed(2));
 
 			console.log("Saving the following data to Firestore:");
-			console.log("userGLUCOSE:", roundedGlucose);
-			console.log("userSPO2:", roundedSpo2);
+			console.log("userBPM:", data.bpm);
+			console.log("userGLUCOSE:", data.glucose);
+			console.log("userSPO2:", data.spo2);
 			console.log("userUserID:", user.uid);
 
 			await addDoc(collection(firestore, "UserHealthData"), {
-				userGLUCOSE: roundedGlucose,
-				userSPO2: roundedSpo2,
+				userBPM: data.bpm,
+				userGLUCOSE: data.glucose,
+				userSPO2: data.spo2,
 				userUserID: user.uid,
 				HDtimestamp: new Date(),
 			});
