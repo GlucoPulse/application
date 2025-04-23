@@ -1,6 +1,6 @@
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 import {
 	View,
@@ -11,6 +11,7 @@ import {
 	StatusBar,
 	ScrollView,
 	TouchableOpacity,
+	RefreshControl
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import * as FileSystem from "expo-file-system";
@@ -24,6 +25,7 @@ const ChartsPage = () => {
 	const [userGLUCOSELineData, setUserGLUCOSELineData] = useState([]);
 	const [userSPO2LineData, setUserSPO2LineData] = useState([]);
 	const [timeRange, setTimeRange] = useState("hour");
+	const [refreshing, setRefreshing] = useState(false);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -340,6 +342,41 @@ const ChartsPage = () => {
 			console.log("No user is currently authenticated.");
 		}
 	};
+	/*
+		const onRefresh = useCallback(() => {
+			setRefreshing(true);
+	
+			setTimeout(() => {
+				setRefreshing(false);
+			}, 2000);
+		}, []);
+	*/
+
+	const fetchData = async () => {
+		setRefreshing(true);
+
+		const db = getFirestore();
+		const auth = getAuth();
+		const user = auth.currentUser;
+
+		if (user) {
+			// (same code as before)
+			// Fetch and filter valGLUser, userGLUCOSE, and userSPO2...
+			// Format and set line chart data...
+		} else {
+			console.log("No user is currently authenticated.");
+		}
+
+		setRefreshing(false);
+	};
+
+	useEffect(() => {
+		fetchData();
+	}, [timeRange]);
+
+	const onRefresh = useCallback(() => {
+		fetchData();
+	}, []);
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -387,6 +424,8 @@ const ChartsPage = () => {
 					}}
 				/>
 				{*/}
+
+				{/*}
 				<View style={styles.pickerContainer}>
 					<Picker
 						selectedValue={null}
@@ -401,10 +440,35 @@ const ChartsPage = () => {
 						<Picker.Item label="All Time" value="all" />
 					</Picker>
 				</View>
+				{*/}
+
+				<View style={styles.pickerContainer}>
+					<Picker
+						selectedValue={timeRange}
+						onValueChange={(value) => {
+							if (value) setTimeRange(value);
+						}}
+						style={styles.picker}
+					>
+						<Picker.Item label="Sort Data" value={null} enabled={false} />
+						<Picker.Item label="Last Hour" value="hour" />
+						<Picker.Item label="Last Day" value="day" />
+						<Picker.Item label="Last Week" value="week" />
+						<Picker.Item label="Last Month" value="month" />
+						<Picker.Item label="All Time" value="all" />
+					</Picker>
+
+				</View>
+
 			</View>
 
 			<View style={styles.body2}>
-				<ScrollView>
+				<ScrollView
+					contentContainerStyle={{ flexGrow: 1 }}
+					refreshControl={
+						<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+					}
+				>
 					<View
 						style={{
 							justifyContent: "center",

@@ -28,37 +28,37 @@ const ScanPage = () => {
 	const firestore = getFirestore();
 	const auth = getAuth(); // Initialize Firebase Auth
 	const [latestEntry, setLatestEntry] = useState(null);
-	/*
-		useEffect(() => {
-			const fetchLatestEntry = async () => {
-				const countRef = ref(database, "health_data/count");
-				onValue(countRef, (snapshot) => {
-					const count = snapshot.val();
-					const latestEntryRef = query(
-						ref(database, "health_data"),
-						orderByKey(),
-						limitToLast(1)
-					);
-					onValue(latestEntryRef, (snapshot) => {
-						snapshot.forEach((childSnapshot) => {
-							const key = childSnapshot.key;
-							if (key.startsWith(`entry${count}`)) {
-								const data = childSnapshot.val();
-								const filteredData = {
-									glucose: data.glucose,
-									spo2: data.spo2,
-								};
-								setLatestEntry(filteredData);
-							}
-						});
+	// const [latestEntries, setLatestEntries] = useState([]);
+	useEffect(() => {
+		const fetchLatestEntry = async () => {
+			const countRef = ref(database, "health_data/count");
+			onValue(countRef, (snapshot) => {
+				const count = snapshot.val();
+				const latestEntryRef = query(
+					ref(database, "health_data"),
+					orderByKey(),
+					limitToLast(1)
+				);
+				onValue(latestEntryRef, (snapshot) => {
+					snapshot.forEach((childSnapshot) => {
+						const key = childSnapshot.key;
+						if (key.startsWith(`entry${count}`)) {
+							const data = childSnapshot.val();
+							const filteredData = {
+								glucose: data.glucose,
+								spo2: data.spo2,
+							};
+							setLatestEntry(filteredData);
+						}
 					});
 				});
-			};
-	
-			fetchLatestEntry();
-		}, []);
-	*/
+			});
+		};
 
+		fetchLatestEntry();
+	}, []);
+
+	/*
 	useEffect(() => {
 		const fetchLatestEntry = async () => {
 			const countRef = ref(database, "health_data/count");
@@ -68,7 +68,6 @@ const ScanPage = () => {
 					console.warn("No count found in database.");
 					return;
 				}
-
 
 				const latestEntryRef = ref(database, `health_data/entry${count}`);
 
@@ -89,23 +88,65 @@ const ScanPage = () => {
 
 		fetchLatestEntry();
 	}, []);
+	*/
+	/*
+	useEffect(() => {
+		const fetchLatestEntry = async () => {
+			const countRef = ref(database, "health_data/count");
+			onValue(countRef, (snapshot) => {
+				const count = snapshot.val();
+				if (!count) {
+					console.warn("No count found in database.");
+					return;
+				}
 
+				const latestEntryRef = ref(database, `health_data/entry${count}`);
+
+				onValue(latestEntryRef, (snapshot) => {
+					const data = snapshot.val();
+					if (data) {
+						const now = Date.now();
+						const FIVE_MINUTES = 5 * 60 * 1000;
+
+						if (data.timestamp && now - data.timestamp <= FIVE_MINUTES) {
+							const filteredData = {
+								glucose: data.glucose,
+								spo2: data.spo2,
+							};
+							setLatestEntry(filteredData);
+						} else {
+							console.warn("Latest entry is older than 5 minutes or missing timestamp.");
+							setLatestEntry(null); // optional: clear stale data
+						}
+					} else {
+						console.warn(`No data found at entry${count}`);
+					}
+				});
+			});
+		};
+
+		fetchLatestEntry();
+	}, []);
+*/
 	const saveToFirestore = async (data) => {
 		const user = auth.currentUser;
 		if (user) {
+
+			const roundedGlucose = Number(data.glucose.toFixed(2));
+			const roundedSpo2 = Number(data.spo2.toFixed(2));
+
 			console.log("Saving the following data to Firestore:");
-			console.log("userGLUCOSE:", data.glucose);
-			console.log("userSPO2:", data.spo2);
+			console.log("userGLUCOSE:", roundedGlucose);
+			console.log("userSPO2:", roundedSpo2);
 			console.log("userUserID:", user.uid);
 
 			await addDoc(collection(firestore, "UserHealthData"), {
-				userGLUCOSE: data.glucose,
-				userSPO2: data.spo2,
+				userGLUCOSE: roundedGlucose,
+				userSPO2: roundedSpo2,
 				userUserID: user.uid,
-				HDtimestamp: new Date(), // Add timestamp here
+				HDtimestamp: new Date(),
 			});
 
-			// Show toast message
 			ToastAndroid.show(
 				"Data Saved: The data has been saved successfully.",
 				ToastAndroid.SHORT
@@ -159,19 +200,69 @@ const ScanPage = () => {
 					</Text>
 				</TouchableOpacity>
 			</View>
-
+			{/*}{*/}
 			{latestEntry && (
 				<View style={styles.dataContainer}>
 					<View style={styles.dataBox}>
 						<Text style={styles.dataLabel}>Glucose</Text>
-						<Text style={styles.dataValue}>{latestEntry.glucose} mg/dL</Text>
+						<Text style={styles.dataValue}>
+							{(latestEntry.glucose).toFixed(2)} mg/dL
+						</Text>
 					</View>
 					<View style={styles.dataBox}>
 						<Text style={styles.dataLabel}>SPO2</Text>
-						<Text style={styles.dataValue}>{latestEntry.spo2}%</Text>
+						<Text style={styles.dataValue}>
+							{(latestEntry.spo2).toFixed(2)}%
+						</Text>
 					</View>
 				</View>
 			)}
+				{/*}
+			{latestEntry ? (
+				<View style={styles.dataContainer}>
+					<View style={styles.dataBox}>
+						<Text style={styles.dataLabel}>Glucose</Text>
+						<Text style={styles.dataValue}>
+							{latestEntry.glucose.toFixed(2)} mg/dL
+						</Text>
+					</View>
+					<View style={styles.dataBox}>
+						<Text style={styles.dataLabel}>SPO2</Text>
+						<Text style={styles.dataValue}>
+							{latestEntry.spo2.toFixed(2)}%
+						</Text>
+					</View>
+				</View>
+			) : (
+				<View style={styles.dataBoxNoData}>
+					<Text style={styles.dataValue}>No recent data found</Text>
+				</View>
+			)}
+
+			
+			{latestEntries.length > 0 ? (
+				latestEntries.map((entry, index) => (
+					<View key={index} style={styles.dataContainer}>
+						<View style={styles.dataBox}>
+							<Text style={styles.dataLabel}>Glucose</Text>
+							<Text style={styles.dataValue}>
+								{entry.glucose.toFixed(2)} mg/dL
+							</Text>
+						</View>
+						<View style={styles.dataBox}>
+							<Text style={styles.dataLabel}>SPO2</Text>
+							<Text style={styles.dataValue}>
+								{entry.spo2.toFixed(2)}%
+							</Text>
+						</View>
+					</View>
+				))
+			) : (
+				<View style={styles.dataBoxNoData}>
+					<Text style={styles.dataValue}>No recent data found</Text>
+				</View>
+			)}
+				{*/}
 
 			<View style={styles.buttonContainer}>
 				<TouchableOpacity
@@ -269,4 +360,18 @@ const styles = StyleSheet.create({
 		fontWeight: "bold",
 		color: "black",
 	},
+	dataBoxNoData: {
+		backgroundColor: "#f0f4f7",
+		borderRadius: 10,
+		padding: 20,
+		alignItems: "center",
+		width: "70%",
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.8,
+		shadowRadius: 2,
+		elevation: 5,
+		marginTop: 65,
+		marginBottom: 65,
+	}
 });

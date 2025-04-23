@@ -33,7 +33,7 @@ const DocumentationPage = () => {
 				<Text style={styles.subheading}>Hardware</Text>
 				<Text style={styles.subsubheading}>Components</Text>
 				<Text style={styles.paragraph}>
-					GlucoPulse uses modular components to make the device functional. It uses NodeMCU ESP32 as the main microcontroller of the system. For the sensor, it uses MAX30100, which can measure both glucose and oxygen saturation levels just by a touch of the fingertip. Furthermore, an OLED screen is also implemented, allowing users to see the results of the system. GlucoPulse uses two rechargeable 3.7V batteries.
+					GlucoPulse uses modular components to make the device functional. It uses NodeMCU ESP32 as the main microcontroller of the system. For the sensor, it uses MAX30102, which can measure both glucose and oxygen saturation levels just by a touch of the fingertip. Furthermore, an OLED screen is also implemented, allowing users to see the results of the system. GlucoPulse uses two rechargeable 3.7V batteries.
 				</Text>
 
 				<Text style={styles.subsubheading}>How To Use the Device</Text>
