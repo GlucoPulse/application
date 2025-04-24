@@ -9,7 +9,7 @@ import {
 	ScrollView,
 	TouchableOpacity,
 } from "react-native";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { getFirestore, collection, getDocs, onSnapshot, query } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 
@@ -23,185 +23,142 @@ const FrontPage = ({ }) => {
 	const [message, setMessage] = useState("");
 	const [glucoseMessage, setGlucoseMessage] = useState("");
 	const [spo2Message, setSPO2Message] = useState("");
+	const [recentHighOutliers, setHighGLOutliers] = useState([]);
+
 
 	const [data, setData] = useState([]);
 	const navigation = useNavigation();
 
 	useEffect(() => {
-		const fetchData = async () => {
-			const db = getFirestore();
-			const auth = getAuth();
-			const user = auth.currentUser;
+		const db = getFirestore();
+		const auth = getAuth();
+		const user = auth.currentUser;
 
-			if (user) {
-				try {
-					// Fetch data from valGLUser collection
-					const valGLUserQuery = collection(db, "valGLUser");
-					const valGLUserSnapshot = await getDocs(valGLUserQuery);
+		if (!user) {
+			console.log("No user is currently authenticated.");
+			return;
+		}
 
-					const valGLUserData = valGLUserSnapshot.docs
-						.map((doc) => {
-							const { glycemicLoad, userid, timestamp } = doc.data();
-							return {
-								glycemicLoad,
-								userid,
-								timestamp,
-							};
-						})
-						.filter((item) => item.userid === user.uid) // Filter by user ID
-						.sort((a, b) => b.timestamp - a.timestamp) // Sort by timestamp in descending order
-						.slice(0, 12); // Get the latest 12 readings
+		// Listener for valGLUser
+		const unsubscribeValGLUser = onSnapshot(
+			query(collection(db, "valGLUser")),
+			(snapshot) => {
+				const valGLUserData = snapshot.docs
+					.map((doc) => doc.data())
+					.filter((item) => item.userid === user.uid)
+					.sort((a, b) => b.timestamp - a.timestamp)
+					.slice(0, 12);
 
-					console.log("Fetched valGLUser data:", valGLUserData);
+				const totalGlycemicLoad = valGLUserData.reduce(
+					(sum, item) => sum + item.glycemicLoad,
+					0
+				);
+				const averageGlycemicLoad = totalGlycemicLoad / valGLUserData.length;
+				setAverageGlycemicLoad(isNaN(averageGlycemicLoad) ? null : averageGlycemicLoad);
 
-					// Calculate the average glycemic load
-					try {
-						const totalGlycemicLoad = valGLUserData.reduce(
-							(sum, item) => sum + item.glycemicLoad,
-							0
-						);
-						const averageGlycemicLoad =
-							totalGlycemicLoad / valGLUserData.length;
-						setAverageGlycemicLoad(
-							isNaN(averageGlycemicLoad) ? null : averageGlycemicLoad
-						);
-
-						// Determine the message based on the average glycemic load
-						if (averageGlycemicLoad > 20) {
-							setMessage(
-								"This is high glycemic load which can cause significant spikes in blood sugar levels, which is dangerous, especially for individuals with diabetes. Try to consume foods that have low glycemic load."
-							);
-						} else if (averageGlycemicLoad >= 11 && averageGlycemicLoad <= 19) {
-							setMessage(
-								"This is normal glycemic load that helps maintain stable blood sugar levels, which is crucial for managing diabetes. Aim to include them in your diet for better control."
-							);
-						} else if (averageGlycemicLoad < 11) {
-							setMessage(
-								"This is a low glycemic load level that help maintain stable blood sugar levels. Extremely low glycemic load can lead to insufficient energy and nutrient intake.  Balance your diet to avoid these negative effects"
-							);
-						} else {
-							setMessage(
-								"No data available. Please proceed to use the device to record your glycemic load levels."
-							);
-						}
-					} catch (error) {
-						console.error("Error calculating average glycemic load: ", error);
-						setMessage(
-							"No data available. Please proceed to use the device to record your glycemic load levels."
-						);
-					}
-
-					// Fetch data from UserHealthData collection
-					const userHealthDataQuery = collection(db, "UserHealthData");
-					const userHealthDataSnapshot = await getDocs(userHealthDataQuery);
-
-					const userHealthData = userHealthDataSnapshot.docs
-						.map((doc) => {
-							const { userGLUCOSE, userSPO2, userUserID, HDtimestamp } =
-								doc.data();
-							return {
-								userGLUCOSE,
-								userSPO2,
-								userUserID,
-								HDtimestamp,
-							};
-						})
-						.filter((item) => item.userUserID === user.uid) // Filter by user ID
-						.sort((a, b) => b.HDtimestamp - a.HDtimestamp) // Sort by timestamp in descending order
-						.slice(0, 12); // Get the latest 12 readings
-
-					console.log("Fetched UserHealthData:", userHealthData);
-
-					// Calculate the average glucose level
-					try {
-						const totalGlucose = userHealthData.reduce(
-							(sum, item) => sum + item.userGLUCOSE,
-							0
-						);
-						const averageGlucose = totalGlucose / userHealthData.length;
-						setAverageGlucose(isNaN(averageGlucose) ? null : averageGlucose);
-
-						// Determine the message based on the average glucose level
-						if (averageGlucose > 140) {
-							setGlucoseMessage(
-								"High glucose level detected. This can lead to serious health issues like heart disease, nerve damage, and kidney problems. Please consult your doctor immediately"
-							);
-						} else if (averageGlucose >= 70 && averageGlucose <= 140) {
-							setGlucoseMessage(
-								"Normal glucose level detected. This indicates good blood sugar control. Keep up the good work and maintain a healthy lifestyle."
-							);
-						} else if (averageGlucose < 70) {
-							setGlucoseMessage(
-								"Low glucose level detected. This can cause symptoms like dizziness, confusion, and fainting. Please consult your doctor immediately."
-							);
-						} else {
-							setGlucoseMessage(
-								"No data available. Please proceed to use the device to record your glucose levels."
-							);
-						}
-					} catch (error) {
-						console.error("Error calculating average glucose: ", error);
-						setGlucoseMessage(
-							"No data available. Please proceed to use the device to record your glucose levels."
-						);
-					}
-
-					// Calculate the average oxygen saturation level
-					try {
-						const totalSPO2 = userHealthData.reduce(
-							(sum, item) => sum + item.userSPO2,
-							0
-						);
-						const averageSPO2 = totalSPO2 / userHealthData.length;
-						setAverageSPO2(isNaN(averageSPO2) ? null : averageSPO2);
-
-						// Determine the message based on the average oxygen saturation level
-						if (averageSPO2 < 95) {
-							setSPO2Message(
-								"Low oxygen saturation level detected. This can lead to symptoms like shortness of breath, confusion, and chest pain. Please consult your doctor immediately."
-							);
-						} else if (averageSPO2 >= 95) {
-							setSPO2Message(
-								"Normal oxygen saturation level detected. This indicates healthy oxygen levels in your blood, supporting overall well-being. Keep up the good work and maintain a healthy lifestyle."
-							);
-						} else {
-							setSPO2Message(
-								"No data available. Please proceed to use the device to record your oxygen saturation levels."
-							);
-						}
-					} catch (error) {
-						console.error("Error calculating average SPO2: ", error);
-						setSPO2Message(
-							"No data available. Please proceed to use the device to record your oxygen saturation levels."
-						);
-					}
-				} catch (error) {
-					console.error("Error fetching data: ", error);
-					setMessage("Error fetching data. Please try again later.");
-					setGlucoseMessage("Error fetching data. Please try again later.");
-					setSPO2Message("Error fetching data. Please try again later.");
+				if (averageGlycemicLoad > 20) {
+					setMessage(
+						"This is high glycemic load which can cause significant spikes in blood sugar levels, which is dangerous, especially for individuals with diabetes. Try to consume foods that have low glycemic load."
+					);
+				} else if (averageGlycemicLoad >= 11 && averageGlycemicLoad <= 19) {
+					setMessage(
+						"This is normal glycemic load that helps maintain stable blood sugar levels, which is crucial for managing diabetes. Aim to include them in your diet for better control."
+					);
+				} else if (averageGlycemicLoad < 11) {
+					setMessage(
+						"This is a low glycemic load level that help maintain stable blood sugar levels. Extremely low glycemic load can lead to insufficient energy and nutrient intake.  Balance your diet to avoid these negative effects"
+					);
+				} else {
+					setMessage(
+						"No data available. Please proceed to use the device to record your glycemic load levels."
+					);
 				}
-			} else {
-				console.log("No user is currently authenticated.");
+				const highGLOutliers = valGLUserData.filter(item => item.glycemicLoad > 20);
+				setHighGLOutliers(highGLOutliers);
+
+				const now = Date.now();
+				const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
+				const recentHighOutliers = highGLOutliers.filter(item => item.timestamp >= oneWeekAgo);
+
+				if (recentHighOutliers.length >= 3) {
+					setMessage(
+						"You've had 3 or more high glycemic load meals in the past week. This can increase your risk of blood sugar spikes — consider choosing lower-GL foods."
+					);
+				}
 			}
-		};
+		);
+
+		const unsubscribeUserHealthData = onSnapshot(
+			query(collection(db, "UserHealthData")),
+			(snapshot) => {
+				const userHealthData = snapshot.docs
+					.map((doc) => doc.data())
+					.filter((item) => item.userUserID === user.uid)
+					.sort((a, b) => b.HDtimestamp - a.HDtimestamp)
+					.slice(0, 12);
+
+				const totalGlucose = userHealthData.reduce(
+					(sum, item) => sum + item.userGLUCOSE,
+					0
+				);
+				const averageGlucose = totalGlucose / userHealthData.length;
+				setAverageGlucose(isNaN(averageGlucose) ? null : averageGlucose);
+
+				if (averageGlucose > 140) {
+					setGlucoseMessage(
+						"High glucose level detected. This can lead to serious health issues like heart disease, nerve damage, and kidney problems. Please consult your doctor immediately"
+					);
+				} else if (averageGlucose >= 70 && averageGlucose <= 140) {
+					setGlucoseMessage(
+						"Normal glucose level detected. This indicates good blood sugar control. Keep up the good work and maintain a healthy lifestyle."
+					);
+				} else if (averageGlucose < 70) {
+					setGlucoseMessage(
+						"Low glucose level detected. This can cause symptoms like dizziness, confusion, and fainting. Please consult your doctor immediately."
+					);
+				} else {
+					setGlucoseMessage(
+						"No data available. Please proceed to use the device to record your glucose levels."
+					);
+				}
+
+				const totalSPO2 = userHealthData.reduce(
+					(sum, item) => sum + item.userSPO2,
+					0
+				);
+				const averageSPO2 = totalSPO2 / userHealthData.length;
+				setAverageSPO2(isNaN(averageSPO2) ? null : averageSPO2);
+
+				if (averageSPO2 < 95) {
+					setSPO2Message(
+						"Low oxygen saturation level detected. This can lead to symptoms like shortness of breath, confusion, and chest pain. Please consult your doctor immediately."
+					);
+				} else if (averageSPO2 >= 95) {
+					setSPO2Message(
+						"Normal oxygen saturation level detected. This indicates healthy oxygen levels in your blood, supporting overall well-being. Keep up the good work and maintain a healthy lifestyle."
+					);
+				} else {
+					setSPO2Message(
+						"No data available. Please proceed to use the device to record your oxygen saturation levels."
+					);
+				}
+
+			}
+		);
 
 		const getGL = async () => {
-			const db = getFirestore();
 			const querySnapshot = await getDocs(collection(db, "glycemicLoad"));
 			const items = querySnapshot.docs.map((doc) => doc.data());
-
-			// Shuffle the array
 			const shuffledItems = items.sort(() => 0.5 - Math.random());
-
-			// Select the first three items
 			const selectedItems = shuffledItems.slice(0, 3);
-
 			setData(selectedItems);
 		};
-
-		fetchData();
 		getGL();
+
+		return () => {
+			unsubscribeValGLUser();
+			unsubscribeUserHealthData();
+		};
 	}, []);
 
 	return (
@@ -231,46 +188,84 @@ const FrontPage = ({ }) => {
 
 			<View style={styles.body}>
 				<Text style={styles.label}>Latest Statistics</Text>
-				<Text style={styles.title}>Average Glycemic Load Level</Text>
+				<Text style={styles.title}>Glycemic Load Level Average</Text>
 				{averageGlycemicLoad !== null ? (
 					<>
 						<Text style={styles.average}>{averageGlycemicLoad.toFixed(1)}</Text>
-						<Text style={styles.message}>{message}</Text>
+
+						{averageGlycemicLoad > 20 ? (
+							<Text style={styles.message}>
+								This is <Text style={{ fontWeight: 'bold' }}>high glycemic load</Text> which can cause significant spikes in blood sugar levels, which is dangerous, especially for individuals with diabetes. Try to consume foods that have low glycemic load.
+							</Text>
+						) : averageGlycemicLoad >= 11 && averageGlycemicLoad <= 19 ? (
+							<Text style={styles.message}>
+								This is <Text style={{ fontWeight: 'bold' }}>normal glycemic load</Text> that helps maintain stable blood sugar levels, which is crucial for managing diabetes. Aim to include them in your diet for better control.
+							</Text>
+						) : (
+							<Text style={styles.message}>
+								This is a <Text style={{ fontWeight: 'bold' }}>low glycemic load</Text> level that helps maintain stable blood sugar levels. Extremely low glycemic load can lead to insufficient energy and nutrient intake. Balance your diet to avoid these negative effects.
+							</Text>
+						)}
+
+						{recentHighOutliers.length >= 3 && (
+							<Text style={[styles.message, { color: 'red' }]}>
+								You've had 3 or more high glycemic load meals in the past week. This can increase your risk of blood sugar spikes — consider choosing lower-GL foods.
+							</Text>
+						)}
 					</>
 				) : (
 					<Text style={styles.message}>
-						No data available. Please proceed to use the device to record your
-						glycemic load levels.
+						No data available. Please proceed to use the device to record your glycemic load levels.
 					</Text>
 				)}
-				<Text style={styles.title}>Average Glucose Level</Text>
+				<Text style={styles.title}>Glucose Level Average</Text>
 				{averageGlucose !== null ? (
 					<>
 						<Text style={styles.average}>
 							{averageGlucose.toFixed(1)} mg/dL
 						</Text>
-						<Text style={styles.message}>{glucoseMessage}</Text>
+
+						{averageGlucose > 140 ? (
+							<Text style={styles.message}>
+								<Text style={{ fontWeight: 'bold' }}>High glucose level</Text> detected. This can lead to serious health issues like heart disease, nerve damage, and kidney problems. Please consult your doctor immediately.
+							</Text>
+						) : averageGlucose >= 70 && averageGlucose <= 140 ? (
+							<Text style={styles.message}>
+								<Text style={{ fontWeight: 'bold' }}>Normal glucose level</Text> detected. This indicates good blood sugar control. Keep up the good work and maintain a healthy lifestyle.
+							</Text>
+						) : (
+							<Text style={styles.message}>
+								<Text style={{ fontWeight: 'bold' }}>Low glucose level</Text> detected. This can cause symptoms like dizziness, confusion, and fainting. Please consult your doctor immediately.
+							</Text>
+						)}
 					</>
 				) : (
 					<Text style={styles.message}>
-						No data available. Please proceed to use the device to record your
-						glucose levels.
+						No data available. Please proceed to use the device to record your glucose levels.
 					</Text>
 				)}
-				<Text style={styles.title}>Average Oxygen Saturation Level</Text>
+				<Text style={styles.title}>Oxygen Saturation Level Average</Text>
 				{averageSPO2 !== null ? (
 					<>
 						<Text style={styles.average}>{averageSPO2.toFixed(1)}%</Text>
-						<Text style={styles.message}>{spo2Message}</Text>
+
+						{averageSPO2 < 95 ? (
+							<Text style={styles.message}>
+								<Text style={{ fontWeight: 'bold' }}>Low oxygen saturation level</Text> detected. This can lead to symptoms like shortness of breath, confusion, and chest pain. Please consult your doctor immediately.
+							</Text>
+						) : (
+							<Text style={styles.message}>
+								<Text style={{ fontWeight: 'bold' }}>Normal oxygen saturation level</Text> detected. This indicates healthy oxygen levels in your blood, supporting overall well-being. Keep up the good work and maintain a healthy lifestyle.
+							</Text>
+						)}
 					</>
 				) : (
 					<Text style={styles.message}>
-						No data available. Please proceed to use the device to record your
-						oxygen saturation levels.
+						No data available. Please proceed to use the device to record your oxygen saturation levels.
 					</Text>
 				)}
 
-				<Text style={styles.label2}>Foods Suggestion</Text>
+				<Text style={styles.label2}>Random Food Suggestions</Text>
 
 				<ScrollView contentContainerStyle={styles.container1}>
 					{data.map((item, index) => (
@@ -379,5 +374,20 @@ const styles = StyleSheet.create({
 		marginLeft: 25,
 		fontSize: 20,
 		fontWeight: "bold",
+	},
+	outlierContainer: {
+		marginTop: 10,
+		backgroundColor: '#fff3cd',
+		padding: 10,
+		borderRadius: 10,
+	},
+	outlierTitle: {
+		fontWeight: 'bold',
+		color: '#856404',
+		marginBottom: 5,
+	},
+	outlierText: {
+		color: '#856404',
+		fontSize: 14,
 	},
 });

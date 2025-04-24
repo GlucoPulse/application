@@ -15,6 +15,7 @@ import {
 	getDatabase,
 	ref,
 	onValue,
+	off,
 } from "firebase/database";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -23,33 +24,43 @@ import * as IntentLauncher from "expo-intent-launcher";
 const ScanPage = () => {
 	const database = getDatabase();
 	const firestore = getFirestore();
-	const auth = getAuth(); // Initialize Firebase Auth
+	const auth = getAuth();
 	const [latestEntry, setLatestEntry] = useState(null);
 
-	useEffect(() => {
-		const fetchLatestEntry = async () => {
-			const countRef = ref(database, "health_data/count");
-			onValue(countRef, (snapshot) => {
-				const count = snapshot.val();
-				if (!count) {
-					console.warn("No count found in database.");
-					return;
+	const fetchLatestEntry = () => {
+		const countRef = ref(database, "health_data/count");
+
+		onValue(countRef, (countSnapshot) => {
+			const count = countSnapshot.val();
+			if (!count) {
+				console.warn("No count found in database.");
+				return;
+			}
+
+			const latestEntryRef = ref(database, `health_data/entry${count}`);
+			onValue(latestEntryRef, (dataSnapshot) => {
+				const data = dataSnapshot.val();
+				if (data) {
+					const filteredData = {
+						glucose: data.glucose,
+						spo2: data.spo2,
+					};
+					setLatestEntry(filteredData);
+				} else {
+					console.warn(`No data found at entry${count}`);
 				}
-				const latestEntryRef = ref(database, `health_data/entry${count}`);
-				onValue(latestEntryRef, (snapshot) => {
-					const data = snapshot.val();
-					if (data) {
-						const filteredData = {
-							glucose: data.glucose,
-							spo2: data.spo2,
-						};
-						setLatestEntry(filteredData);
-					} else {
-						console.warn(`No data found at entry${count}`);
-					}
-				});
 			});
-		}; fetchLatestEntry();
+		});
+	};
+
+	useEffect(() => {
+		fetchLatestEntry();
+
+		// Clean up listeners
+		return () => {
+			off(ref(database, "health_data/count"));
+			// optionally, you could also remove previous entry listeners
+		};
 	}, []);
 
 	const saveToFirestore = async (data) => {
@@ -61,13 +72,13 @@ const ScanPage = () => {
 
 			console.log("Saving the following data to Firestore:");
 			console.log("userBPM:", data.bpm);
-			console.log("userGLUCOSE:", data.glucose);
-			console.log("userSPO2:", data.spo2);
+			console.log("userGLUCOSE:", roundedGlucose);
+			console.log("userSPO2:", roundedSpo2);
 			console.log("userUserID:", user.uid);
 
 			await addDoc(collection(firestore, "UserHealthData"), {
-				userGLUCOSE: data.glucose,
-				userSPO2: data.spo2,
+				userGLUCOSE: roundedGlucose,
+				userSPO2: roundedSpo2,
 				userUserID: user.uid,
 				HDtimestamp: new Date(),
 			});
@@ -142,7 +153,23 @@ const ScanPage = () => {
 				</View>
 			)}
 
-			<View style={styles.buttonContainer}>
+			<View style={[styles.buttonContainer, {marginTop: 20}]}>
+				<TouchableOpacity
+					style={styles.button}
+					onPress={() => fetchLatestEntry()}
+				>
+					<Text
+						style={{
+							color: "black",
+							fontWeight: "bold",
+							fontSize: 16,
+							textAlign: "center",
+						}}
+					>
+						Refresh
+					</Text>
+				</TouchableOpacity>
+
 				<TouchableOpacity
 					style={styles.button}
 					onPress={() => saveToFirestore(latestEntry)}
@@ -158,6 +185,7 @@ const ScanPage = () => {
 						Save Entry to Profile
 					</Text>
 				</TouchableOpacity>
+
 			</View>
 		</SafeAreaView>
 	);
