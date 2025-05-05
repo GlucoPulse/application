@@ -8,11 +8,12 @@ import {
 	TouchableOpacity,
 	Alert,
 	KeyboardAvoidingView,
+	Modal,
+	ToastAndroid
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "react-native";
 import { getFirestore, collection, getDocs, addDoc } from "firebase/firestore";
-import { ToastAndroid } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { getAuth } from "firebase/auth";
 
@@ -26,6 +27,11 @@ const GlycemicLoadPage = () => {
 	const [dishes, setDishes] = useState([]);
 	const [filteredDishes, setFilteredDishes] = useState([]);
 	const [searchQuery, setSearchQuery] = useState("");
+	const [modalVisible, setModalVisible] = useState(false);
+	const [selectedGLValue, setSelectedGLValue] = useState(null);
+	const [servingSize, setServingSize] = useState('1');
+	const [selectedItem, setSelectedItem] = useState(null);
+
 	const getData = async () => {
 		const queryRef = collection(db, "glycemicLoad");
 		const querySnapshot = await getDocs(queryRef);
@@ -58,39 +64,31 @@ const GlycemicLoadPage = () => {
 	}, [searchQuery, dishes]);
 
 	const userChoice = (glycemicLoadValue) => {
-		Alert.alert("Save Value", "Do you want to save this value?", [
-			{
-				text: "No",
-				onPress: () =>
-					ToastAndroid.show(
-						"Action Cancelled: You did not save the value.",
-						ToastAndroid.SHORT
-					),
-				style: "cancel",
-			},
-			{
-				text: "Yes",
-				onPress: async () => {
-					try {
-						await addDoc(collection(db, "valGLUser"), {
-							glycemicLoad: glycemicLoadValue, // Now it's a number
-							timestamp: new Date(),
-							userid: userID,
-						});
-						ToastAndroid.show(
-							"Value Saved: The value has been saved successfully.",
-							ToastAndroid.SHORT
-						);
-					} catch (error) {
-						console.error("Error saving value:", error);
-						ToastAndroid.show(
-							"Saving Failed: An error occurred.",
-							ToastAndroid.SHORT
-						);
-					}
-				},
-			},
-		]);
+		setSelectedGLValue(glycemicLoadValue);
+		setServingSize('1');
+		setModalVisible(true);
+	};
+
+	const saveGlycemicLoad = async () => {
+		const size = parseFloat(servingSize) || 1;
+		const originalServingSize = parseFloat(selectedItem.serving_size) || 1;
+		const adjustedGL = selectedGLValue * (size / originalServingSize);
+
+		try {
+			await addDoc(collection(db, 'valGLUser'), {
+				glycemicLoad: adjustedGL,
+				timestamp: new Date(),
+				userid: userID,
+			});
+			ToastAndroid.show(
+				'Value Saved: The value has been saved successfully.',
+				ToastAndroid.SHORT
+			);
+		} catch (error) {
+			console.error('Error saving value:', error);
+			ToastAndroid.show('Saving Failed: An error occurred.', ToastAndroid.SHORT);
+		}
+		setModalVisible(false);
 	};
 
 	const moreInfo = () => {
@@ -109,7 +107,11 @@ const GlycemicLoadPage = () => {
 		<View style={styles.itemContainer}>
 			<TouchableOpacity
 				style={styles.button}
-				onPress={() => userChoice(parseInt(item.glycemic_load))}
+				onPress={() => {
+					setSelectedItem(item); 
+					setSelectedGLValue(parseFloat(item.glycemic_load));
+					setModalVisible(true);
+				}}
 			>
 				<View style={styles.rightColumn}>
 					<Text style={styles.foodText}>{item.food}</Text>
@@ -168,13 +170,33 @@ const GlycemicLoadPage = () => {
 
 			<View style={styles.body}>
 				<FlatList
-
 					data={filteredDishes}
 					renderItem={renderItem}
 					keyExtractor={(item) => item.id}
-
 				/>
 			</View>
+
+			<Modal visible={modalVisible} animationType="slide" transparent>
+				<View style={styles.modalBackground}>
+					<View style={styles.modalContainer}>
+						<Text style={styles.label}>Enter Serving Size (g/ml):</Text>
+						<TextInput
+							style={styles.input}
+							keyboardType="numeric"
+							value={servingSize}
+							onChangeText={setServingSize}
+						/>
+						<View style={styles.buttonRow}>
+							<TouchableOpacity onPress={() => setModalVisible(false)}>
+								<Text style={styles.cancelButton}>Cancel</Text>
+							</TouchableOpacity>
+							<TouchableOpacity onPress={saveGlycemicLoad}>
+								<Text style={styles.saveButton}>Save</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
+				</View>
+			</Modal>
 		</KeyboardAvoidingView>
 	);
 };
@@ -277,5 +299,36 @@ const styles = StyleSheet.create({
 	},
 	body: {
 		height: "65%",
+	},
+	modalBackground: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+	},
+	modalContainer: {
+		width: '80%',
+		backgroundColor: 'white',
+		padding: 20,
+		borderRadius: 10,
+		elevation: 5,
+	},
+	label: {
+		fontSize: 16,
+		marginBottom: 10,
+	},
+	buttonRow: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+	},
+	cancelButton: {
+		color: 'red',
+		fontSize: 16,
+		paddingHorizontal: 10,
+	},
+	saveButton: {
+		color: 'green',
+		fontSize: 16,
+		paddingHorizontal: 10,
 	},
 });

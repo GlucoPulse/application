@@ -55,6 +55,11 @@ const DocumentationPage = () => {
 					Click the GlucoPulse_AP on the Wi-Fi settings to change the Wi-Fi credentials of the GlucoPulse device. Keep in mind that the Wi-Fi connection of the phone should be reverted back to garner the data for both the device and application.
 				</Text>
 
+				<Text style={styles.subsubheading}>Troubleshooting</Text>
+				<Text style={styles.paragraph}>
+					Should the user encounter a misfunctioning sensor, the user should opt to reset the device by pressing the reset button on the casing.
+				</Text>
+
 			</ScrollView>
 		</SafeAreaView>
 	);
@@ -116,6 +121,6 @@ const styles = StyleSheet.create({
 	body: {
 		marginLeft: 25,
 		marginRight: 25,
-		marginTop:15 ,
+		marginTop: 15,
 	}
 });
