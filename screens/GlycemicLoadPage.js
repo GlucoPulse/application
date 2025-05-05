@@ -176,7 +176,7 @@ const GlycemicLoadPage = () => {
 				/>
 			</View>
 
-			<Modal visible={modalVisible} animationType="slide" transparent>
+			<Modal visible={modalVisible} animationType="fade" transparent>
 				<View style={styles.modalBackground}>
 					<View style={styles.modalContainer}>
 						<Text style={styles.label}>Enter Serving Size (g/ml):</Text>
