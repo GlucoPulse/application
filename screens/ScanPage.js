@@ -19,10 +19,11 @@ import {
 } from "firebase/database";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { app2} from "../firebase";
 import * as IntentLauncher from "expo-intent-launcher";
 
 const ScanPage = () => {
-	const database = getDatabase();
+	const database = getDatabase(app2);
 	const firestore = getFirestore();
 	const auth = getAuth();
 	const [latestEntry, setLatestEntry] = useState(null);
