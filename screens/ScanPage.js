@@ -19,7 +19,7 @@ import {
 } from "firebase/database";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { app2} from "../firebase";
+import { app2 } from "../firebase";
 import * as IntentLauncher from "expo-intent-launcher";
 
 const ScanPage = () => {
@@ -154,7 +154,7 @@ const ScanPage = () => {
 				</View>
 			)}
 
-			<View style={[styles.buttonContainer, {marginTop: 20}]}>
+			<View style={[styles.buttonContainer, { marginTop: 20 }]}>
 				<TouchableOpacity
 					style={styles.button}
 					onPress={() => fetchLatestEntry()}
