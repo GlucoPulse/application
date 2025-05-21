@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.js": "/application/static/js/main.3b5a9048.js",
+    "static/js/670.e0c3b571.js": "/application/static/js/670.e0c3b571.js",
+    "static/media/MaterialCommunityIcons.ttf": "/application/static/media/MaterialCommunityIcons.5d42b4e60858731e7b65.ttf",
+    "static/media/MaterialIcons.ttf": "/application/static/media/MaterialIcons.f20305dee9d396fea5c7.ttf",
+    "static/media/icon.png": "/application/static/media/icon.28f7feeb2343b103908d.png",
+    "static/media/FontAwesome.ttf": "/application/static/media/FontAwesome.1e59d2330b4c6deb84b3.ttf",
+    "static/media/word-logo-whitevar.png": "/application/static/media/word-logo-whitevar.f0b5d6e51ba205209bfd.png",
+    "index.html": "/application/index.html",
+    "manifest.json": "/application/manifest.json",
+    "serve.json": "/application/serve.json",
+    "main.3b5a9048.js.map": "/application/static/js/main.3b5a9048.js.map",
+    "670.e0c3b571.js.map": "/application/static/js/670.e0c3b571.js.map"
+  },
+  "entrypoints": [
+    "static/js/670.e0c3b571.js",
+    "static/js/main.3b5a9048.js"
+  ]
+}
