@@ -1,7 +1,8 @@
 {
   "expo": {
     "name": "GlucoPulse",
-    "slug": "GlucoPulse",
+    "slug": "gp-app",
+    "platforms": ["ios", "android", "web"],
     "version": "0.2.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
@@ -11,7 +12,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "dlar.glucopulse.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -20,6 +25,12 @@
       },
       "package": "dlar.glucopulse.app"
     },
-    "web": {}
+    "web": {},
+    "extra": {
+      "eas": {
+        "projectId": "df0b2cbf-f5f6-43b0-9b73-33e9d14338bb"
+      }
+    },
+    "owner": "clerizedd"
   }
 }

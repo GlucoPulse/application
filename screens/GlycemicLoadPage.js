@@ -79,7 +79,7 @@ const GlycemicLoadPage = () => {
 				glycemicLoad: adjustedGL,
 				timestamp: new Date(),
 				userid: userID,
-			});
+			}); //if android show toast android elif web show toastify
 			ToastAndroid.show(
 				'Value Saved: The value has been saved successfully.',
 				ToastAndroid.SHORT
